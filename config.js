@@ -49,21 +49,8 @@
 //------------------------
   config.logging = {
     // The logging level of the messages. Messages with a level equal or superior to this will be logged.
-    //  Accepted values are: "debug", "info", "warn" and "error". Default value: "info".
-    level: 'info',
-    // A flag indicating if the logs should be sent to the console. Default value: "true".
-    toConsole: 'true',
-    // A flag indicating if the logs should be sent to a file. Default value: "true".
-    toFile: 'true',
-    // Maximum size in bytes of the log files. If the maximum size is reached, a new log file is
-    //  created incrementing a counter used as the suffix for the log file name. Default value: "0" (no
-    //  size limit).
-    maxFileSize: '0',
-    // The path to a directory where the log file will be searched for or created if it does not exist.
-    //  Default value: "./log".
-    directoryPath: '.' + path.sep + 'log',
-    // The name of the file where the logs will be stored. Default value: "sth_app.log".
-    fileName: 'context_adapter.log',
+    //  Accepted values are: "DEBUG", "INFO", "WARN", "ERROR" and "FATAL". Default value: "INFO".
+    level: 'INFO',
     // The time in seconds between proof of life logging messages informing that the server is up and running normally.
     //  Default value: "60"
     proofOfLifeInterval: '60'

@@ -44,10 +44,12 @@
   },
   "keywords": [],
   "dependencies": {
+    "async": "^1.4.2",
     "boom": "^2.8.0",
     "hapi": "^8.8.1",
+    "logops": "^0.5.0",
     "mkdirp": "^0.5.1",
     "request": "^2.60.0",
-    "winston": "^1.0.1"
+    "revalidator": "^0.3.1"
   }
 }

@@ -16,7 +16,133 @@ The Context Adapter is a FIWARE component part of the Black Button platform by T
 The Context Adapter is in charge of adapting the communication (protocols and messages) between
 Telefónica's IoT Platform (and, more concretely, the [Orion Context Broker](https://github.com/telefonicaid/fiware-orion))
 and the services exposed by Third Parties.
- 
+
+More concretely, the Context Adapter attends 2 types of requests:
+
+1 `updateContext` requests redirected by the Orion Context Broker. These requests should have a payload such as the
+following one:
+
+<pre>
+    {
+      contextElements: [
+        {
+          id: <device-id>,
+          type: caConfig.BUTTON_ENTITY.TYPE,
+          isPattern: false,
+          attributes: [
+            {
+              name: caConfig.BUTTON_ENTITY.CA_EXTERNAL_ID_ATTR_NAME,
+              type: 'string',
+              value: '<aux-external-id>'
+            },
+            {
+              name: caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME,
+              type: 'string',
+              value: '<aux-service-id>'
+            },
+            {
+              name: caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
+              type: 'string',
+              value: 'S | C'
+            },
+            {
+              name: caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME,
+              type: 'string',
+              value: '<aux-op-extra>'
+            },
+            {
+              name: caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME,
+              type: 'string',
+              value: '<aux-op-status>'
+            }
+          ]
+        }
+      ],
+      updateAction: 'UPDATE'
+    }
+</pre>
+
+2 `update` requests by third party's services when updating information about an asynchronous request. These requests
+should have a payload such as the following one:
+
+<pre>
+    {
+      buttonId: <button-id>,
+      externalButtonId: <external-button-id>,
+      serviceId: <service-id>,
+      action: <action>,
+      extra: <extra>,
+      result: <result>
+    }
+</pre>
+
+On the other hand, the Context Adapter queries (`queryContext`) the Orion Context Broker for service information using
+a payload such as the following one:
+
+<pre>
+    {
+      entities: [
+        {
+          id: <service-id>,
+          type: 'service',
+          isPattern: false,
+          attributes: [
+            'endpoint',
+            'method',
+            'authentication',
+            'mapping',
+            'timeout'
+          ]
+        }
+      ]
+    }
+</pre>
+
+To which, the Orion Context Broker responds providing the concrete service information, if any:
+
+<pre>
+    {
+      contextElements: [
+        {
+          id: <service-id>,
+          type: 'service',
+          isPattern: false,
+          attributes: [
+            {
+              name: 'endpoint',
+              type: 'string',
+              value: '<endpoint>'
+            },
+            {
+              name: 'method',
+              type: 'string',
+              value: '<method>'
+            },
+            {
+              name: 'authentication',
+              type: 'string',
+              value: <authentication>
+            },
+            {
+              name: 'mapping',
+              type: 'string',
+              value: '<mapping>'
+            },
+            {
+              name: 'timeout',
+              type: 'string',
+              value: '<timeout>'
+            }
+          ]
+        }
+      ],
+      statusCode: {
+        code: '200',
+        reasonPhrase: 'OK'
+      }
+    }
+</pre>
+
 [Top](#section0)
 
 ##<a id="section2"></a> Dependencies
@@ -52,14 +178,8 @@ The script accepts the following parameters as environment variables:
 - CA_HOST: The host where the Context Adapter server will be started. Optional. Default value: "localhost".
 - CA_PORT: The port where the Context Adapter server will be listening. Optional. Default value: "9999".
 - CA_PATH: The path to add to the routes where the Context Broker is attending requests. Optional. Default value: "/v1".
-- LOG_LEVEL: The logging level of the messages. Messages with a level equal or superior to this will be logged.
+- LOGOPS_LEVEL: The logging level of the messages. Messages with a level equal or superior to this will be logged.
 Accepted values are: "debug", "info", "warn" and "error". Optional. Default value: "info".
-- LOG_TO_CONSOLE: A flag indicating if the logs should be sent to the console. Optional. Default value: "true".
-- LOG_TO_FILE: A flag indicating if the logs should be sent to a file. Optional. Default value: "true".
-- LOG_FILE_MAX_SIZE_IN_BYTES: Maximum size in bytes of the log files. If the maximum size is reached, a new log file is created incrementing
-a counter used as the suffix for the log file name. Optional. Default value: "0" (no size limit).
-- LOG_DIR: The path to a directory where the log file will be searched for or created if it does not exist. Optional. Default value: "./log".
-- LOG_FILE_NAME: The name of the file where the logs will be stored. Optional. Default value: "context_adapter.log".
 - PROOF_OF_LIFE_INTERVAL: The time in seconds between proof of life logging messages informing that the server is up and running normally. Default value: "60".
 - DEFAULT_SERVICE: The service to be used if not sent by the Orion Context Broker in the requests. Optional. Default value: "blackbutton".
 - DEFAULT_SERVICE_PATH: The service path to be used if not sent by the Orion Context Broker in the requests. Optional. Default value: "/".
@@ -71,6 +191,9 @@ For example, to start the Context Adapter and make it listen on port 7777, use:
 
 As already mentioned, all this configuration parameters can also be adjusted using the
 [`config.js`](https://github.com/telefonicaid/context-adapter/blob/develop/config.js) file whose contents are self-explanatory.
+
+It is important to note that the Context Adapter component uses the `logops` module. For more information about how to further
+configure it, please visit [https://www.npmjs.com/package/logops](https://www.npmjs.com/package/logops).
 
 [Top](#section0)
 
