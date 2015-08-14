@@ -413,7 +413,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if an error occured when retrieving service information from the Context Broker',
+      it('should notify the request as \'closed\' if an error occured when retrieving service information ' +
+         'from the Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -487,7 +488,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no id in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no id in the service descriptor response received from ' +
+         'the Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -532,7 +534,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no type in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no type in the service descriptor response received from ' +
+         'the Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -577,7 +580,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no isPattern in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no isPattern in the service descriptor response received from ' +
+         'the Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -622,7 +626,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no endpoint in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no endpoint in the service descriptor response received from ' +
+         'the Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -667,7 +672,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no method in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no method in the service descriptor response received from ' +
+         'the Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -712,7 +718,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no authentication in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no authentication in the service descriptor response received ' +
+         'from the Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -757,7 +764,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no mapping in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no mapping in the service descriptor response received from the ' +
+         'Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -802,7 +810,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no timeout in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no timeout in the service descriptor response received from the ' +
+         'Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -877,7 +886,7 @@ describe('Context Adapter server:', function () {
           nock(endpointDomain).
             intercept(endpointPath, method).
             reply(function () {
-              done()
+              done();
             });
 
           // Generate a valid updateContext request for a synchronous operation
@@ -970,7 +979,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'completed\' if the third party responds successfully to the synchronous request',
+      it('should notify the request as \'completed\' if the third party responds successfully to the synchronous ' +
+         'request',
         function (done) {
           // Generate a service descriptor response having 'http://thirdparty.com/service' as endpoint and
           //  'GET' as method
@@ -1096,7 +1106,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if an error occured when retrieving service information from the Context Broker',
+      it('should notify the request as \'closed\' if an error occured when retrieving service information from the ' +
+         'Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -1170,7 +1181,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no id in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no id in the service descriptor response received from the ' +
+         'Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -1215,7 +1227,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no type in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no type in the service descriptor response received from the ' +
+         'Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -1260,7 +1273,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no isPattern in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no isPattern in the service descriptor response received from ' +
+         'the Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -1305,7 +1319,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no endpoint in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no endpoint in the service descriptor response received from ' +
+         'the Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -1350,7 +1365,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no method in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no method in the service descriptor response received from the ' +
+         'Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -1395,7 +1411,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no authentication in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no authentication in the service descriptor response received ' +
+         'from the Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -1440,7 +1457,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no mapping in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no mapping in the service descriptor response received from the ' +
+         'Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -1485,7 +1503,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if no timeout in the service descriptor response received from the Context Broker',
+      it('should notify the request as \'closed\' if no timeout in the service descriptor response received from the ' +
+         'Context Broker',
         function (done) {
           testHelper.nockContextBroker(
             {
@@ -1560,7 +1579,7 @@ describe('Context Adapter server:', function () {
           nock(endpointDomain).
             intercept(endpointPath, method).
             reply(function () {
-              done()
+              done();
             });
 
           // Generate a valid updateContext request for a synchronous operation
@@ -1588,7 +1607,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'closed\' if the third party responds with an error to the asynchronous request',
+      it('should notify the request as \'closed\' if the third party responds with an error to the asynchronous ' +
+         'request',
         function (done) {
           // Generate a service descriptor response having 'http://thirdparty.com/service' as endpoint and
           //  'GET' as method
@@ -1653,7 +1673,8 @@ describe('Context Adapter server:', function () {
         }
       );
 
-      it('should notify the request as \'in_progress\' if the third party responds successfully to the asynchronous request',
+      it('should notify the request as \'in_progress\' if the third party responds successfully to the asynchronous ' +
+         'request',
         function (done) {
           // Generate a service descriptor response having 'http://thirdparty.com/service' as endpoint and
           //  'GET' as method
@@ -1756,12 +1777,12 @@ describe('Context Adapter server:', function () {
                 }
               }
             }
-          ), function (err, response, body) {
+          ), function (err, response) {
             expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
           }
         );
-      })
+      });
     });
   });
 });

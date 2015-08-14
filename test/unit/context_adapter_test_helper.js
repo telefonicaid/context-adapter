@@ -181,6 +181,19 @@ function getServiceDescriptorResponse(options) {
       }
     ]
   };
+
+  /**
+   * Processes the attributes configuration options passed
+   */
+  function processAttributes() {
+    for (var i = 0; i < options.contextResponses.contextElement.attributes.length; i++) {
+      caHelper.removeAttribute(
+        response.contextResponses[0].contextElement.attributes,
+        options.contextResponses.contextElement.attributes[i]
+      );
+    }
+  }
+
   if (options) {
     if (options.contextResponses) {
       if (options.contextResponses.contextElement) {
@@ -195,12 +208,7 @@ function getServiceDescriptorResponse(options) {
         }
         if (options.contextResponses.contextElement.attributes &&
           Array.isArray(options.contextResponses.contextElement.attributes)) {
-          for (var i = 0; i < options.contextResponses.contextElement.attributes.length; i++) {
-            caHelper.removeAttribute(
-              response.contextResponses[0].contextElement.attributes,
-              options.contextResponses.contextElement.attributes[i]
-            );
-          }
+          processAttributes();
         }
       }
       if (options.contextResponses.statusCode) {
@@ -313,7 +321,7 @@ function nockContextBroker(options, done) {
           )
         ];
       }
-    )
+    );
   } else if (options.replyQueryContextWithServiceDescriptor) {
     contextBroker.post(
       caConfig.CB_PATH + '/queryContext'
@@ -323,7 +331,7 @@ function nockContextBroker(options, done) {
           JSON.stringify(options.replyQueryContextWithServiceDescriptor)
         ];
       }
-    )
+    );
   }
 
   // Nock the Context Broker to listen for status notifications via an
