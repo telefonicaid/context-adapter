@@ -34,9 +34,9 @@ var nock = require('nock');
 console.log('*** Running the Context Adapter unit tests with the following configuration:');
 console.log(caConfig);
 
-describe('Context Adapter server:', function () {
-  it('should start successfully', function (done) {
-    contextAdapter.server.start(caConfig.CA_HOST, caConfig.CA_PORT, function (err, hapiServer) {
+describe('Context Adapter server:', function() {
+  it('should start successfully', function(done) {
+    contextAdapter.server.start(caConfig.CA_HOST, caConfig.CA_PORT, function(err, hapiServer) {
       expect(err).to.equal(undefined);
       expect(hapiServer).to.be.an.instanceof(hapi.Server);
       expect(hapiServer).to.be.equal(contextAdapter.server.hapiServer);
@@ -44,15 +44,15 @@ describe('Context Adapter server:', function () {
     });
   });
 
-  describe('HTTP methods:', function () {
-    it('should respond with 404 - Not Found if invalid HTTP method', function (done) {
+  describe('HTTP methods:', function() {
+    it('should respond with 404 - Not Found if invalid HTTP method', function(done) {
       request(
         testHelper.getRequestOptions(
           {
             method: 'PUT'
           }
         ),
-        function (err, response, body) {
+        function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(404);
           expect(body.statusCode).to.equal(404);
@@ -64,15 +64,15 @@ describe('Context Adapter server:', function () {
 
   });
 
-  describe('Headers:', function () {
-    it('should respond with 400 - Bad Request if missing Fiware-Service header', function (done) {
+  describe('Headers:', function() {
+    it('should respond with 400 - Bad Request if missing Fiware-Service header', function(done) {
       request(
         testHelper.getRequestOptions(
           {
             headers: ['Fiware-Service']
           }
         ),
-        function (err, response, body) {
+        function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(400);
           expect(body.statusCode).to.equal(400);
@@ -83,14 +83,14 @@ describe('Context Adapter server:', function () {
       );
     });
 
-    it('should respond with 400 - Bad Request if missing Fiware-ServicePath header', function (done) {
+    it('should respond with 400 - Bad Request if missing Fiware-ServicePath header', function(done) {
       request(
         testHelper.getRequestOptions(
           {
             headers: ['Fiware-ServicePath']
           }
         ),
-        function (err, response, body) {
+        function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(400);
           expect(body.statusCode).to.equal(400);
@@ -102,8 +102,8 @@ describe('Context Adapter server:', function () {
     });
   });
 
-  describe('Routes:', function () {
-    it('should respond with 404 - Not Found if invalid route', function (done) {
+  describe('Routes:', function() {
+    it('should respond with 404 - Not Found if invalid route', function(done) {
       request(
         testHelper.getRequestOptions(
           {
@@ -111,7 +111,7 @@ describe('Context Adapter server:', function () {
             caConfig.CA_PATH + '/invalidPath'
           }
         ),
-        function (err, response, body) {
+        function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(404);
           expect(body.statusCode).to.equal(404);
@@ -122,11 +122,11 @@ describe('Context Adapter server:', function () {
     });
   });
 
-  describe('updateContext requests:', function () {
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if empty payload', function (done) {
+  describe('updateContext requests:', function() {
+    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if empty payload', function(done) {
       request(
         testHelper.getRequestOptions(),
-        function (err, response, body) {
+        function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
           expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -137,7 +137,7 @@ describe('Context Adapter server:', function () {
     });
 
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s id',
-      function (done) {
+      function(done) {
         request(
           testHelper.getRequestOptions(
             {
@@ -148,7 +148,7 @@ describe('Context Adapter server:', function () {
               })
             }
           ),
-          function (err, response, body) {
+          function(err, response, body) {
             expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
             expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -159,7 +159,7 @@ describe('Context Adapter server:', function () {
       });
 
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s type',
-      function (done) {
+      function(done) {
         request(
           testHelper.getRequestOptions(
             {
@@ -170,7 +170,7 @@ describe('Context Adapter server:', function () {
               })
             }
           ),
-          function (err, response, body) {
+          function(err, response, body) {
             expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
             expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -181,7 +181,7 @@ describe('Context Adapter server:', function () {
       });
 
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s isPattern',
-      function (done) {
+      function(done) {
         request(
           testHelper.getRequestOptions(
             {
@@ -192,7 +192,7 @@ describe('Context Adapter server:', function () {
               })
             }
           ),
-          function (err, response, body) {
+          function(err, response, body) {
             expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
             expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -203,7 +203,7 @@ describe('Context Adapter server:', function () {
       });
 
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_EXTERNAL_ID_ATTR_NAME + ' attribute', function (done) {
+      caConfig.BUTTON_ENTITY.CA_EXTERNAL_ID_ATTR_NAME + ' attribute', function(done) {
       request(
         testHelper.getRequestOptions(
           {
@@ -214,7 +214,7 @@ describe('Context Adapter server:', function () {
             })
           }
         ),
-        function (err, response, body) {
+        function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
           expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -225,7 +225,7 @@ describe('Context Adapter server:', function () {
     });
 
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME + ' attribute', function (done) {
+      caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME + ' attribute', function(done) {
       request(
         testHelper.getRequestOptions(
           {
@@ -236,7 +236,7 @@ describe('Context Adapter server:', function () {
             })
           }
         ),
-        function (err, response, body) {
+        function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
           expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -247,7 +247,7 @@ describe('Context Adapter server:', function () {
     });
 
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME + ' attribute', function (done) {
+      caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME + ' attribute', function(done) {
       request(
         testHelper.getRequestOptions(
           {
@@ -258,7 +258,7 @@ describe('Context Adapter server:', function () {
             })
           }
         ),
-        function (err, response, body) {
+        function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
           expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -269,7 +269,7 @@ describe('Context Adapter server:', function () {
     });
 
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if the contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME + ' attribute is not \'S\' or \'C\'', function (done) {
+      caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME + ' attribute is not \'S\' or \'C\'', function(done) {
       var updateContextPayload = testHelper.getUpdateContextPayload();
       caHelper.setAttribute(
         updateContextPayload.contextElements[0].attributes,
@@ -283,7 +283,7 @@ describe('Context Adapter server:', function () {
             body: updateContextPayload
           }
         ),
-        function (err, response, body) {
+        function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
           expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -294,7 +294,7 @@ describe('Context Adapter server:', function () {
     });
 
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME + ' attribute', function (done) {
+      caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME + ' attribute', function(done) {
       var updateContextPayload = testHelper.getUpdateContextPayload({
         contextElements: {
           attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME]
@@ -312,7 +312,7 @@ describe('Context Adapter server:', function () {
             body: updateContextPayload
           }
         ),
-        function (err, response, body) {
+        function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
           expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -323,7 +323,7 @@ describe('Context Adapter server:', function () {
     });
 
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME + ' attribute', function (done) {
+      caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME + ' attribute', function(done) {
       var updateContextPayload = testHelper.getUpdateContextPayload({
         contextElements: {
           attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME]
@@ -341,7 +341,7 @@ describe('Context Adapter server:', function () {
             body: updateContextPayload
           }
         ),
-        function (err, response, body) {
+        function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
           expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -351,9 +351,9 @@ describe('Context Adapter server:', function () {
       );
     });
 
-    describe('Synchronous operation requests (\'S\'):', function () {
+    describe('Synchronous operation requests (\'S\'):', function() {
       it('should respond with a 200 code and \'OK\' reasonPhrase if valid payload',
-        function (done) {
+        function(done) {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
@@ -366,7 +366,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               expect(err).to.equal(null);
               expect(response.statusCode).to.equal(200);
               expect(body.contextResponses[0].statusCode.code).to.equal('200');
@@ -377,7 +377,7 @@ describe('Context Adapter server:', function () {
         });
 
       it('should notify the request as \'closed\' if no Context Broker available to serve service information',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               allowUnmocked: true,
@@ -401,7 +401,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -415,7 +415,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if an error occured when retrieving service information ' +
          'from the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithError: true,
@@ -439,7 +439,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -452,7 +452,7 @@ describe('Context Adapter server:', function () {
       );
 
       it('should notify the request as \'closed\' if no service information available in the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithNGSICode: true,
@@ -476,7 +476,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -490,7 +490,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no id in the service descriptor response received from ' +
          'the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -522,7 +522,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -536,7 +536,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no type in the service descriptor response received from ' +
          'the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -568,7 +568,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -582,7 +582,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no isPattern in the service descriptor response received from ' +
          'the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -614,7 +614,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -628,7 +628,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no endpoint in the service descriptor response received from ' +
          'the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -660,7 +660,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -674,7 +674,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no method in the service descriptor response received from ' +
          'the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -706,7 +706,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -720,7 +720,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no authentication in the service descriptor response received ' +
          'from the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -752,7 +752,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -766,7 +766,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no mapping in the service descriptor response received from the ' +
          'Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -798,7 +798,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -812,7 +812,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no timeout in the service descriptor response received from the ' +
          'Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -844,7 +844,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -858,7 +858,7 @@ describe('Context Adapter server:', function () {
 
       it('should send a synchronous request to the third party if a valid service descriptor is retrieved and ' +
         'a synchronous operation is requested',
-        function (done) {
+        function(done) {
           // Generate a service descriptor response having 'http://thirdparty.com/service' as endpoint and
           //  'GET' as method
           var endpointDomain = 'http://thirdparty.com',
@@ -885,7 +885,7 @@ describe('Context Adapter server:', function () {
           //  method set
           nock(endpointDomain).
             intercept(endpointPath, method).
-            reply(function () {
+            reply(function() {
               done();
             });
 
@@ -902,7 +902,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -915,7 +915,7 @@ describe('Context Adapter server:', function () {
       );
 
       it('should notify the request as \'closed\' if the third party responds with an error to the synchronous request',
-        function (done) {
+        function(done) {
           // Generate a service descriptor response having 'http://thirdparty.com/service' as endpoint and
           //  'GET' as method
           var endpointDomain = 'http://thirdparty.com',
@@ -967,7 +967,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -981,7 +981,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'completed\' if the third party responds successfully to the synchronous ' +
          'request',
-        function (done) {
+        function(done) {
           // Generate a service descriptor response having 'http://thirdparty.com/service' as endpoint and
           //  'GET' as method
           var endpointDomain = 'http://thirdparty.com',
@@ -1013,7 +1013,7 @@ describe('Context Adapter server:', function () {
           //  method set and reply with no error
           nock(endpointDomain).
             intercept(endpointPath, method).
-            reply(function (uri, requestBody) {
+            reply(function(uri, requestBody) {
               return [200, JSON.stringify(requestBody)];
             });
 
@@ -1030,7 +1030,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1043,9 +1043,9 @@ describe('Context Adapter server:', function () {
       );
     });
 
-    describe('Asynchronous operation requests (\'C\'):', function () {
+    describe('Asynchronous operation requests (\'C\'):', function() {
       it('should respond with a 200 code and \'OK\' reasonPhrase if valid payload',
-        function (done) {
+        function(done) {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
@@ -1058,7 +1058,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               expect(err).to.equal(null);
               expect(response.statusCode).to.equal(200);
               expect(body.contextResponses[0].statusCode.code).to.equal('200');
@@ -1070,7 +1070,7 @@ describe('Context Adapter server:', function () {
       );
 
       it('should notify the request as \'closed\' if no Context Broker available to serve service information',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               allowUnmocked: true,
@@ -1094,7 +1094,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1108,7 +1108,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if an error occured when retrieving service information from the ' +
          'Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithError: true,
@@ -1132,7 +1132,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1145,7 +1145,7 @@ describe('Context Adapter server:', function () {
       );
 
       it('should notify the request as \'closed\' if no service information available in the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithNGSIError: true,
@@ -1169,7 +1169,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1183,7 +1183,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no id in the service descriptor response received from the ' +
          'Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -1215,7 +1215,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1229,7 +1229,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no type in the service descriptor response received from the ' +
          'Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -1261,7 +1261,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1275,7 +1275,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no isPattern in the service descriptor response received from ' +
          'the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -1307,7 +1307,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1321,7 +1321,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no endpoint in the service descriptor response received from ' +
          'the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -1353,7 +1353,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1367,7 +1367,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no method in the service descriptor response received from the ' +
          'Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -1399,7 +1399,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1413,7 +1413,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no authentication in the service descriptor response received ' +
          'from the Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -1445,7 +1445,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1459,7 +1459,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no mapping in the service descriptor response received from the ' +
          'Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -1491,7 +1491,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1505,7 +1505,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if no timeout in the service descriptor response received from the ' +
          'Context Broker',
-        function (done) {
+        function(done) {
           testHelper.nockContextBroker(
             {
               replyQueryContextWithServiceDescriptor: testHelper.getServiceDescriptorResponse(
@@ -1537,7 +1537,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1551,7 +1551,7 @@ describe('Context Adapter server:', function () {
 
       it('should send a asynchronous request to the third party if a valid service descriptor is retrieved and ' +
         'an asynchronous operation is requested',
-        function (done) {
+        function(done) {
           // Generate a service descriptor response having 'http://thirdparty.com/service' as endpoint and
           //  'GET' as method
           var endpointDomain = 'http://thirdparty.com',
@@ -1570,7 +1570,7 @@ describe('Context Adapter server:', function () {
 
           testHelper.nockContextBroker(
             {
-              replyQueryContextWithServiceDescriptor: response,
+              replyQueryContextWithServiceDescriptor: response
             }
           );
 
@@ -1578,7 +1578,7 @@ describe('Context Adapter server:', function () {
           //  method set
           nock(endpointDomain).
             intercept(endpointPath, method).
-            reply(function () {
+            reply(function() {
               done();
             });
 
@@ -1595,7 +1595,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1609,7 +1609,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'closed\' if the third party responds with an error to the asynchronous ' +
          'request',
-        function (done) {
+        function(done) {
           // Generate a service descriptor response having 'http://thirdparty.com/service' as endpoint and
           //  'GET' as method
           var endpointDomain = 'http://thirdparty.com',
@@ -1661,7 +1661,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1675,7 +1675,7 @@ describe('Context Adapter server:', function () {
 
       it('should notify the request as \'in_progress\' if the third party responds successfully to the asynchronous ' +
          'request',
-        function (done) {
+        function(done) {
           // Generate a service descriptor response having 'http://thirdparty.com/service' as endpoint and
           //  'GET' as method
           var endpointDomain = 'http://thirdparty.com',
@@ -1707,7 +1707,7 @@ describe('Context Adapter server:', function () {
           //  method set and reply with no error
           nock(endpointDomain).
             intercept(endpointPath, method).
-            reply(function (uri, requestBody) {
+            reply(function(uri, requestBody) {
               return [200, JSON.stringify(requestBody)];
             });
 
@@ -1724,7 +1724,7 @@ describe('Context Adapter server:', function () {
                 body: updateContextPayload
               }
             ),
-            function (err, response, body) {
+            function(err, response, body) {
               // The Context Adapter should reply successfully to the updateContext request as
               //  soon as it validates it
               expect(err).to.equal(null);
@@ -1737,15 +1737,15 @@ describe('Context Adapter server:', function () {
       );
     });
 
-    describe('Update notification by third party: ', function () {
-      it('should notify the asynchronous request as \'completed\'', function (done) {
+    describe('Update notification by third party: ', function() {
+      it('should notify the asynchronous request as \'completed\'', function(done) {
         // Nock the Context Broker to listen for:
         //  1. The \'completed\' status notification via an updateContext request
         nock(
           'http://' + caConfig.CB_HOST + ':' + caConfig.CB_PORT
         ).post(
           caConfig.CB_PATH + '/updateContext'
-        ).reply(function (uri, requestBody) {
+        ).reply(function(uri, requestBody) {
             // The updateContext request should include a operation status attribute set
             //  to closed
             expect(caHelper.getAttributeValue(
@@ -1777,7 +1777,7 @@ describe('Context Adapter server:', function () {
                 }
               }
             }
-          ), function (err, response) {
+          ), function(err, response) {
             expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
           }

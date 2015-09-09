@@ -253,7 +253,7 @@ function getRequestOptions(options) {
     body: options.body || {}
   };
   if (options.headers) {
-    options.headers.forEach(function (header) {
+    options.headers.forEach(function(header) {
       delete requestOptions.headers[header];
     });
   }
@@ -262,7 +262,7 @@ function getRequestOptions(options) {
 
 /**
  * Nocks the Context Broker
- * @param {object] options object to configure the behavior of the Context Broker. For example,
+ * @param {Object} options Object to configure the behavior of the Context Broker. For example,
  *  an options object such as:
  *    {
  *      allowUnmocked: true,
@@ -274,8 +274,8 @@ function getRequestOptions(options) {
  *    }
  *  will make the nocked Context Broker to allow unmocked operations, to reply with an error, an NGSI error or
  *  a valid service description (depending on the selected option) and will expect status notification for the
- *  provided status and result prefix.
- * @param {function} done The done() function to notify the unit tests as concluded
+ *  provided status and result prefix
+ * @param {Function} done The done() function to notify the unit tests as concluded
  */
 function nockContextBroker(options, done) {
   options = options || {};
@@ -308,7 +308,7 @@ function nockContextBroker(options, done) {
   } else if (options.replyQueryContextWithNGSICode) {
     contextBroker.post(
       caConfig.CB_PATH + '/queryContext'
-    ).reply(function () {
+    ).reply(function() {
         return [
           200,
           JSON.stringify(
@@ -325,7 +325,7 @@ function nockContextBroker(options, done) {
   } else if (options.replyQueryContextWithServiceDescriptor) {
     contextBroker.post(
       caConfig.CB_PATH + '/queryContext'
-    ).reply(function () {
+    ).reply(function() {
         return [
           200,
           JSON.stringify(options.replyQueryContextWithServiceDescriptor)
@@ -339,7 +339,7 @@ function nockContextBroker(options, done) {
   if (options.statusNotification) {
     contextBroker.post(
       caConfig.CB_PATH + '/updateContext'
-    ).reply(function (uri, requestBody) {
+    ).reply(function(uri, requestBody) {
         // The updateContext request should include a operation status attribute set
         //  to closed
         if (options.statusNotification.status) {
@@ -359,7 +359,7 @@ function nockContextBroker(options, done) {
         }
         if (options.statusNotification.attributes &&
           Array.isArray(options.statusNotification.attributes)) {
-          options.statusNotification.attributes.forEach(function (attribute) {
+          options.statusNotification.attributes.forEach(function(attribute) {
             expect(caHelper.getAttributeValue(
               JSON.parse(requestBody).contextElements[0].attributes,
               attribute)).to.exist;
@@ -373,6 +373,10 @@ function nockContextBroker(options, done) {
   }
 }
 
+/**
+ * Properties and functions exported by the module
+ * @type {{server, startup: startup, exitGracefully: exitGracefully}}
+ */
 module.exports = {
   getUpdateContextPayload: getUpdateContextPayload,
   getServiceDescriptorResponse: getServiceDescriptorResponse,
