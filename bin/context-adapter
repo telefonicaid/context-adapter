@@ -28,4 +28,3 @@
 var contextAdapter = require('../lib/context_adapter');
 
 contextAdapter.startup();
-
