@@ -37,7 +37,6 @@ var nock = require('nock');
    *      id: false,
    *      isPattern: false,
    *      attributes: [
-   *        caConfig.BUTTON_ENTITY.CA_EXTERNAL_ID_ATTR_NAME,
    *        caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME
    *      ]
    *    },
@@ -56,11 +55,6 @@ function getUpdateContextPayload(options) {
         type: caConfig.BUTTON_ENTITY.TYPE,
         isPattern: 'false',
         attributes: [
-          {
-            name: caConfig.BUTTON_ENTITY.CA_EXTERNAL_ID_ATTR_NAME,
-            type: 'string',
-            value: '<aux-external-id>'
-          },
           {
             name: caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME,
             type: 'string',

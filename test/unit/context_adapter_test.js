@@ -201,28 +201,6 @@ describe('Context Adapter server:', function() {
       });
 
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_EXTERNAL_ID_ATTR_NAME + ' attribute', function(done) {
-      request(
-        testHelper.getRequestOptions(
-          {
-            body: testHelper.getUpdateContextPayload({
-              contextElements: {
-                attributes: [caConfig.BUTTON_ENTITY.CA_EXTERNAL_ID_ATTR_NAME]
-              }
-            })
-          }
-        ),
-        function(err, response, body) {
-          expect(err).to.equal(null);
-          expect(response.statusCode).to.equal(200);
-          expect(body.contextResponses[0].statusCode.code).to.equal('400');
-          expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
-          done();
-        }
-      );
-    });
-
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
       caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME + ' attribute', function(done) {
       request(
         testHelper.getRequestOptions(
@@ -1694,8 +1672,7 @@ describe('Context Adapter server:', function() {
             {
               replyQueryContextWithServiceDescriptor: response,
               statusNotification: {
-                status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.IN_PROGRESS,
-                attributes: [caConfig.BUTTON_ENTITY.EXTERNAL_ID_ATTR_NAME]
+                status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.IN_PROGRESS
               }
             },
             done
@@ -1768,7 +1745,6 @@ describe('Context Adapter server:', function() {
               body: {
                 operationDescriptor: {
                   buttonId: '<button-id>',
-                  externalButtonId: '<external-button-id>',
                   serviceId: '<service-id>',
                   action: '<action>',
                   extra: ' <extra>'
