@@ -56,9 +56,14 @@ function getUpdateContextPayload(options) {
         isPattern: 'false',
         attributes: [
           {
+            name: caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            type: 'string',
+            value: '<aux-interaction-type>'
+          },
+          {
             name: caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME,
             type: 'string',
-            value: '<service-id>'
+            value: '<aux-service-id>'
           },
           {
             name: caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,

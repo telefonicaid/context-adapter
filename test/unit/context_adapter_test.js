@@ -201,6 +201,28 @@ describe('Context Adapter server:', function() {
       });
 
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+      caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME + ' attribute', function(done) {
+      request(
+        testHelper.getRequestOptions(
+          {
+            body: testHelper.getUpdateContextPayload({
+              contextElements: {
+                attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME]
+              }
+            })
+          }
+        ),
+        function(err, response, body) {
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('400');
+          expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+          done();
+        }
+      );
+    });
+
+    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
       caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME + ' attribute', function(done) {
       request(
         testHelper.getRequestOptions(
@@ -244,31 +266,6 @@ describe('Context Adapter server:', function() {
       );
     });
 
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if the contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME + ' attribute is not \'S\' or \'C\'', function(done) {
-      var updateContextPayload = testHelper.getUpdateContextPayload();
-      caHelper.setAttribute(
-        updateContextPayload.contextElements[0].attributes,
-        caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-        'NOT_S_OR_C'
-      );
-
-      request(
-        testHelper.getRequestOptions(
-          {
-            body: updateContextPayload
-          }
-        ),
-        function(err, response, body) {
-          expect(err).to.equal(null);
-          expect(response.statusCode).to.equal(200);
-          expect(body.contextResponses[0].statusCode.code).to.equal('400');
-          expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
-          done();
-        }
-      );
-    });
-
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
       caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME + ' attribute', function(done) {
       var updateContextPayload = testHelper.getUpdateContextPayload({
@@ -278,8 +275,8 @@ describe('Context Adapter server:', function() {
       });
       caHelper.setAttribute(
         updateContextPayload.contextElements[0].attributes,
-        caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-        caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS
+        caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+        caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS
       );
 
       request(
@@ -307,8 +304,8 @@ describe('Context Adapter server:', function() {
       });
       caHelper.setAttribute(
         updateContextPayload.contextElements[0].attributes,
-        caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-        caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS
+        caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+        caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS
       );
 
       request(
@@ -327,14 +324,14 @@ describe('Context Adapter server:', function() {
       );
     });
 
-    describe('Synchronous operation requests (\'S\'):', function() {
+    describe('Synchronous operation requests:', function() {
       it('should respond with a 200 code and \'OK\' reasonPhrase if valid payload',
         function(done) {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -368,8 +365,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -406,8 +403,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -443,8 +440,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -489,8 +486,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -535,8 +532,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -581,8 +578,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -627,8 +624,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -673,8 +670,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -719,8 +716,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -765,8 +762,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -811,8 +808,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -869,8 +866,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -934,8 +931,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -997,8 +994,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.SYNCHRONOUS);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.SYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1019,14 +1016,14 @@ describe('Context Adapter server:', function() {
       );
     });
 
-    describe('Asynchronous operation requests (\'C\'):', function() {
+    describe('Asynchronous operation requests:', function() {
       it('should respond with a 200 code and \'OK\' reasonPhrase if valid payload',
         function(done) {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1061,8 +1058,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1099,8 +1096,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1136,8 +1133,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1182,8 +1179,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1228,8 +1225,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1274,8 +1271,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1320,8 +1317,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1366,8 +1363,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1412,8 +1409,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1458,8 +1455,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1504,8 +1501,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1562,8 +1559,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1628,8 +1625,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
@@ -1690,8 +1687,8 @@ describe('Context Adapter server:', function() {
           var updateContextPayload = testHelper.getUpdateContextPayload();
           caHelper.setAttribute(
             updateContextPayload.contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
-            caConfig.BUTTON_ENTITY.OPERATION_ACTION.ASYNCHRONOUS_CREATE);
+            caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.OPERATION_INTERACTION_TYPE.ASYNCHRONOUS);
 
           request(
             testHelper.getRequestOptions(
