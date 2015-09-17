@@ -36,7 +36,7 @@ following one:
               value: '<aux-service-id>'
             },
             {
-              name: caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+              name: caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
               type: 'string',
               value: 'synchronous | asynchronous'
             },

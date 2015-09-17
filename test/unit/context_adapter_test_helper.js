@@ -26,6 +26,7 @@
 var caConfig = require('../../lib/context_adapter_configuration');
 var caHelper = require('../../lib/context_adapter_helper');
 var nock = require('nock');
+var request = require('request');
 
 /**
  * Returns a valid and well-formed or invalid and not well-formed
@@ -56,7 +57,7 @@ function getUpdateContextPayload(options) {
         isPattern: 'false',
         attributes: [
           {
-            name: caConfig.BUTTON_ENTITY.CA_OPERATION_INTERACTION_TYPE_ATTR_NAME,
+            name: caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
             type: 'string',
             value: '<aux-interaction-type>'
           },
@@ -146,6 +147,11 @@ function getServiceDescriptorResponse(options) {
           type: caConfig.SERVICE_ENTITY.TYPE,
           isPattern: 'false',
           attributes: [
+            {
+              name: caConfig.SERVICE_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+              type: 'string',
+              value: '<interaction-type>'
+            },
             {
               name: caConfig.SERVICE_ENTITY.ENDPOINT_ATTR_NAME,
               type: 'string',
@@ -373,6 +379,652 @@ function nockContextBroker(options, done) {
 }
 
 /**
+ * Main test suite covering the Context Adapter operation
+ * @param updateContextPayload The updateContext payload received by the Context Adapter
+ * @param serviceDescriptorResponse The service descriptor queried to the Context Broker
+ * @param endpointDomain The endpoint domain where the Third Party is listening
+ * @param endpointPath The endpoint path where the Third Party is listening
+ * @param method The method to be used in the requests sent to the Third Party
+ */
+function operationTestSuite(updateContextPayload, interactionType) {
+  // Generate a service descriptor response having 'http://thirdparty.com/service' as endpoint and
+  //  'GET' as method
+  var endpointDomain = 'http://thirdparty.com',
+    endpointPath = '/service',
+    method = 'GET';
+  var serviceDescriptorResponse = getServiceDescriptorResponse();
+
+  beforeEach(function() {
+    caHelper.setAttribute(
+      serviceDescriptorResponse.contextResponses[0].contextElement.attributes,
+      caConfig.SERVICE_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+      interactionType
+    );
+    caHelper.setAttribute(
+      serviceDescriptorResponse.contextResponses[0].contextElement.attributes,
+      caConfig.SERVICE_ENTITY.ENDPOINT_ATTR_NAME,
+      endpointDomain + endpointPath
+    );
+    caHelper.setAttribute(
+      serviceDescriptorResponse.contextResponses[0].contextElement.attributes,
+      caConfig.SERVICE_ENTITY.METHOD_ATTR_NAME,
+      method);
+  });
+
+  it('should respond with a 200 code and \'OK\' reasonPhrase if valid payload',
+    function(done) {
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+          done();
+        }
+      );
+    });
+
+  it('should notify the request as \'closed\' if no Context Broker available to serve service information',
+    function(done) {
+      nockContextBroker(
+        {
+          allowUnmocked: true,
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if an error occured when retrieving service information ' +
+    'from the Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithError: true,
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if no service information available in the Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithNGSICode: true,
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if no id in the service descriptor response received from ' +
+    'the Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
+            {
+              contextResponses: {
+                contextElement: {
+                  id: false
+                }
+              }
+            }
+          ),
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if no type in the service descriptor response received from ' +
+    'the Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
+            {
+              contextResponses: {
+                contextElement: {
+                  type: false
+                }
+              }
+            }
+          ),
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if no isPattern in the service descriptor response received from ' +
+    'the Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
+            {
+              contextResponses: {
+                contextElement: {
+                  isPattern: false
+                }
+              }
+            }
+          ),
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if no endpoint in the service descriptor response received from ' +
+    'the Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
+            {
+              contextResponses: {
+                contextElement: {
+                  attributes: [caConfig.SERVICE_ENTITY.ENDPOINT_ATTR_NAME]
+                }
+              }
+            }
+          ),
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if no method in the service descriptor response received from ' +
+    'the Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
+            {
+              contextResponses: {
+                contextElement: {
+                  attributes: [caConfig.SERVICE_ENTITY.METHOD_ATTR_NAME]
+                }
+              }
+            }
+          ),
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if no authentication in the service descriptor response received ' +
+    'from the Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
+            {
+              contextResponses: {
+                contextElement: {
+                  attributes: [caConfig.SERVICE_ENTITY.AUTHENTICATION_ATTR_NAME]
+                }
+              }
+            }
+          ),
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if no mapping in the service descriptor response received from the ' +
+    'Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
+            {
+              contextResponses: {
+                contextElement: {
+                  attributes: [caConfig.SERVICE_ENTITY.MAPPING_ATTR_NAME]
+                }
+              }
+            }
+          ),
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if no timeout in the service descriptor response received from the ' +
+    'Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
+            {
+              contextResponses: {
+                contextElement: {
+                  attributes: [caConfig.SERVICE_ENTITY.TIMEOUT_ATTR_NAME]
+                }
+              }
+            }
+          ),
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should send a ' + interactionType + ' request to the third party if a valid service descriptor is retrieved and ' +
+    'a ' + interactionType + ' operation is requested',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: serviceDescriptorResponse
+        }
+      );
+
+      // Nock the Third Party to listen for requests on the specified endpoint and for the
+      //  method set
+      nock(endpointDomain).
+        intercept(endpointPath, method).
+        reply(function() {
+          done();
+        });
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if the third party responds with an error to the ' +
+      interactionType + ' request',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: serviceDescriptorResponse,
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      // Nock the Third Party to listen for requests on the specified endpoint and for the
+      //  method set and respond with an error
+      nock(endpointDomain).
+        intercept(endpointPath, method).
+        replyWithError(
+        {
+          code: 'THE_ERROR_CODE',
+          message: 'THE MESSAGE'
+        }
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'completed\' if the third party responds successfully to the ' +
+      interactionType + ' request (only applies to synchronous third party services)',
+    function(done) {
+      if (interactionType === caConfig.SERVICE_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS) {
+        return done();
+      }
+
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: serviceDescriptorResponse,
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.COMPLETED,
+            resultPrefix: '1'
+          }
+        },
+        done
+      );
+
+      // Nock the Third Party to listen for requests on the specified endpoint and for the
+      //  method set and reply with no error
+      nock(endpointDomain).
+        intercept(endpointPath, method).
+        reply(function(uri, requestBody) {
+          return [200, JSON.stringify(
+            {
+              details: requestBody
+            }
+          )];
+        });
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the ' + interactionType + ' request as \'completed\' if the third party sends a request ' +
+      'to the Context Adapter callback url with the request\'s results ' +
+      '(only applies to synchronous third party services)', function(done) {
+    if (interactionType === caConfig.SERVICE_ENTITY.INTERACTION_TYPES.SYNCHRONOUS) {
+      return done();
+    }
+
+    // Nock the Context Broker to listen for:
+    //  1. The \'completed\' status notification via an updateContext request
+    nock(
+      'http://' + caConfig.CB_HOST + ':' + caConfig.CB_PORT
+    ).post(
+      caConfig.CB_PATH + '/updateContext'
+    ).reply(function(uri, requestBody) {
+        // The updateContext request should include a operation status attribute set
+        //  to closed
+        expect(caHelper.getAttributeValue(
+          JSON.parse(requestBody).contextElements[0].attributes,
+          caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME)).to.equal(
+          caConfig.BUTTON_ENTITY.OPERATION_STATUS.COMPLETED
+        );
+        // The updateContext request should include a operation result attribute
+        //  starting with '0'
+        expect(caHelper.getAttributeValue(
+          JSON.parse(requestBody).contextElements[0].attributes,
+          caConfig.BUTTON_ENTITY.OPERATION_RESULT_ATTR_NAME).indexOf('1')).to.equal(0);
+        done();
+      }
+    );
+
+    request(
+      getRequestOptions(
+        {
+          uri: 'http://' + caConfig.CA_HOST + ':' + caConfig.CA_PORT +
+          caConfig.CA_PATH + caConfig.CA_CALLBACK_PATH,
+          body: {
+            buttonId: '<button-id>',
+            externalId: '<external-id>',
+            details: {
+              key1: 'value1',
+              key2: 'value2',
+              key3: 'value3',
+              key4: 'value4',
+              key5: 'value'
+            }
+          }
+        }
+      ), function(err, response) {
+        expect(err).to.equal(null);
+        expect(response.statusCode).to.equal(200);
+      }
+    );
+  });
+}
+
+/**
  * Properties and functions exported by the module
  * @type {{server, startup: startup, exitGracefully: exitGracefully}}
  */
@@ -380,5 +1032,6 @@ module.exports = {
   getUpdateContextPayload: getUpdateContextPayload,
   getServiceDescriptorResponse: getServiceDescriptorResponse,
   getRequestOptions: getRequestOptions,
-  nockContextBroker: nockContextBroker
+  nockContextBroker: nockContextBroker,
+  operationTestSuite: operationTestSuite
 };
