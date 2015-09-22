@@ -76,7 +76,6 @@ describe('Context Adapter server:', function() {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(400);
           expect(body.statusCode).to.equal(400);
-          expect(response.statusMessage).to.equal('Bad Request');
           expect(body.error).to.equal('Bad Request');
           done();
         }
@@ -94,7 +93,6 @@ describe('Context Adapter server:', function() {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(400);
           expect(body.statusCode).to.equal(400);
-          expect(response.statusMessage).to.equal('Bad Request');
           expect(body.error).to.equal('Bad Request');
           done();
         }
