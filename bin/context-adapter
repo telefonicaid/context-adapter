@@ -27,4 +27,4 @@
 
 var contextAdapter = require('../lib/context_adapter');
 
-contextAdapter.startup();
+contextAdapter.start(true);
