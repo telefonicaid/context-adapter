@@ -34,7 +34,37 @@ console.log('*** Running the Context Adapter unit tests with the following confi
 console.log(caConfig);
 
 describe('Context Adapter server:', function() {
-  it('should start successfully', function(done) {
+  it('should stop the Context Adapter although not started:', function(done) {
+    contextAdapter.stop(function(err) {
+      expect(err).to.equal(undefined);
+      done();
+    });
+  });
+
+  it('should start the Context Adapter:', function(done) {
+    contextAdapter.start(false, function(err) {
+      expect(err).to.equal(undefined);
+      expect(contextAdapter.server.hapiServer).to.be.an.instanceof(hapi.Server);
+      done();
+    });
+  });
+
+  it ('should stop the Context Adapter when started:', function(done) {
+    contextAdapter.stop(function(err) {
+      expect(err).to.equal(undefined);
+      expect(contextAdapter.server.hapiServer.info.started).to.equal(0);
+      done();
+    });
+  });
+
+  it('should stop the Context Adapter server although not started', function(done) {
+    contextAdapter.server.stop(function(err) {
+      expect(err).to.equal(undefined);
+      done();
+    });
+  });
+
+  it('should start the Context Adapter server', function(done) {
     contextAdapter.server.start(caConfig.CA_HOST, caConfig.CA_PORT, function(err, hapiServer) {
       expect(err).to.equal(undefined);
       expect(hapiServer).to.be.an.instanceof(hapi.Server);
