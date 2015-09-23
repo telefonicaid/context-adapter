@@ -148,6 +148,11 @@ function getServiceDescriptorResponse(options) {
           isPattern: 'false',
           attributes: [
             {
+              name: caConfig.SERVICE_ENTITY.PROVIDER_ATTR_NAME,
+              type: 'string',
+              value: '<provider>'
+            },
+            {
               name: caConfig.SERVICE_ENTITY.INTERACTION_TYPE_ATTR_NAME,
               type: 'string',
               value: '<interaction-type>'
@@ -613,6 +618,86 @@ function operationTestSuite(updateContextPayload, interactionType) {
               contextResponses: {
                 contextElement: {
                   isPattern: false
+                }
+              }
+            }
+          ),
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if no provider in the service descriptor response received from ' +
+    'the Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
+            {
+              contextResponses: {
+                contextElement: {
+                  attributes: [caConfig.SERVICE_ENTITY.PROVIDER_ATTR_NAME]
+                }
+              }
+            }
+          ),
+          statusNotification: {
+            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
+            resultPrefix: '0'
+          }
+        },
+        done
+      );
+
+      request(
+        getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          // The Context Adapter should reply successfully to the updateContext request as
+          //  soon as it validates it
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+        }
+      );
+    }
+  );
+
+  it('should notify the request as \'closed\' if no interaction_type in the service descriptor response received ' +
+    'from the Context Broker',
+    function(done) {
+      nockContextBroker(
+        {
+          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
+            {
+              contextResponses: {
+                contextElement: {
+                  attributes: [caConfig.SERVICE_ENTITY.INTERACTION_TYPE_ATTR_NAME]
                 }
               }
             }
