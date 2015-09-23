@@ -29,7 +29,6 @@ var caHelper = require('../../lib/context_adapter_helper');
 var testHelper = require('./context_adapter_test_helper');
 var hapi = require('hapi');
 var request = require('request');
-var nock = require('nock');
 
 console.log('*** Running the Context Adapter unit tests with the following configuration:');
 console.log(caConfig);
@@ -295,8 +294,9 @@ describe('Context Adapter server:', function() {
       );
     });
 
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME + ' attribute', function(done) {
+    it('should respond with a 200 code and OK reasonPhrase if no contextElement\'s ' +
+      caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME + ' attribute and synchronous ' +
+      'button operation', function(done) {
       var updateContextPayload = testHelper.getUpdateContextPayload({
         contextElements: {
           attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME]
@@ -306,6 +306,36 @@ describe('Context Adapter server:', function() {
         updateContextPayload.contextElements[0].attributes,
         caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
         caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
+      );
+
+      request(
+        testHelper.getRequestOptions(
+          {
+            body: updateContextPayload
+          }
+        ),
+        function(err, response, body) {
+          expect(err).to.equal(null);
+          expect(response.statusCode).to.equal(200);
+          expect(body.contextResponses[0].statusCode.code).to.equal('200');
+          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+          done();
+        }
+      );
+    });
+
+    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+      caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME + ' attribute and asynchronous ' +
+      'button operation',  function(done) {
+      var updateContextPayload = testHelper.getUpdateContextPayload({
+        contextElements: {
+          attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME]
+        }
+      });
+      caHelper.setAttribute(
+        updateContextPayload.contextElements[0].attributes,
+        caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
+        caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS
       );
 
       request(

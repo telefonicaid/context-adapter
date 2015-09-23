@@ -843,8 +843,8 @@ function operationTestSuite(updateContextPayload, interactionType) {
     }
   );
 
-  it('should send a ' + interactionType + ' request to the third party if a valid service descriptor is retrieved and ' +
-    'a ' + interactionType + ' operation is requested',
+  it('should send a ' + interactionType + ' request to the third party if a valid service descriptor is retrieved ' +
+    'and a ' + interactionType + ' operation is requested',
     function(done) {
       nockContextBroker(
         {
