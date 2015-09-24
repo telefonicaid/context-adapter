@@ -114,6 +114,98 @@ function getUpdateContextPayload(options) {
 
 /**
  * Returns a valid and well-formed or invalid and not well-formed
+ *  button descriptor response to a previous queryContext request
+ *  depending on the options passed
+ * @param {object} options Object including the properties which should
+ *  be excluded from the final returned payload. For example, if options is:
+ *  {
+   *    contextResponses: {
+   *      contextElement: {
+   *        id: false,
+   *        isPattern: false,
+   *        attributes: [
+   *          caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME
+   *          caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME
+   *        ]
+   *      }
+   *      statusCode: {
+   *        code: true
+   *      }
+   *    }
+   *  }
+ *  the returned response will not include an id, isPattern properties or
+ *  the specified attributes in the contextElement entry, or the statusCode's
+ *  code property
+ * @return {object} The button descriptor response
+ */
+function getButtonDescriptorResponse(options) {
+  var response = {
+    contextResponses: [
+      {
+        contextElement: {
+          id: '<button-id>',
+          type: caConfig.BUTTON_ENTITY.TYPE,
+          isPattern: 'false',
+          attributes: [
+            {
+              name: caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+              type: 'string',
+              value: '<interaction-type>'
+            }
+          ]
+        },
+        statusCode: {
+          code: '200',
+          reasonPhrase: 'OK'
+        }
+      }
+    ]
+  };
+
+  /**
+   * Processes the attributes configuration options passed
+   */
+  function processAttributes() {
+    for (var i = 0; i < options.contextResponses.contextElement.attributes.length; i++) {
+      caHelper.removeAttribute(
+        response.contextResponses[0].contextElement.attributes,
+        options.contextResponses.contextElement.attributes[i]
+      );
+    }
+  }
+
+  if (options) {
+    if (options.contextResponses) {
+      if (options.contextResponses.contextElement) {
+        if (options.contextResponses.contextElement.id === false) {
+          delete response.contextResponses[0].contextElement.id;
+        }
+        if (options.contextResponses.contextElement.type === false) {
+          delete response.contextResponses[0].contextElement.type;
+        }
+        if (options.contextResponses.contextElement.isPattern === false) {
+          delete response.contextResponses[0].contextElement.isPattern;
+        }
+        if (options.contextResponses.contextElement.attributes &&
+          Array.isArray(options.contextResponses.contextElement.attributes)) {
+          processAttributes();
+        }
+      }
+      if (options.contextResponses.statusCode) {
+        if (options.contextResponses.statusCode.code === false) {
+          delete response.contextResponses[0].statusCode.code;
+        }
+        if (options.contextResponses.statusCode.reasonPhrase === false) {
+          delete response.contextResponses[0].statusCode.reasonPhrase;
+        }
+      }
+    }
+  }
+  return response;
+}
+
+/**
+ * Returns a valid and well-formed or invalid and not well-formed
  *  service descriptor response to a previous queryContext request
  *  depending on the options passed
  * @param {object} options Object including the properties which should
@@ -276,7 +368,11 @@ function getRequestOptions(options) {
  *  an options object such as:
  *    {
  *      allowUnmocked: true,
- *      replyQueryContextWithError|replyQueryContextWithNGSICode|replyQueryContextWithServiceDescriptor: true,
+ *      replyQueryContextWithError|replyQueryContextWithNGSICode: true,
+ *      replyQueryContextWithData: {
+ *        serviceDescriptor: theServiceDescriptor,
+ *        buttonDescriptor: theButtonDescriptor
+ *      },
  *      statusNotification: {
  *        status: 'closed',
  *        resultPrefix: '0'
@@ -332,14 +428,22 @@ function nockContextBroker(options, done) {
         ];
       }
     );
-  } else if (options.replyQueryContextWithServiceDescriptor) {
+  } else if (options.replyQueryContextWithData) {
     contextBroker.post(
       caConfig.CB_PATH + '/queryContext'
-    ).reply(function() {
-        return [
-          200,
-          JSON.stringify(options.replyQueryContextWithServiceDescriptor)
-        ];
+    ).reply(function(uri, requestBody) {
+        var requestBodyObj = JSON.parse(requestBody);
+        if (requestBodyObj.entities[0].type === caConfig.BUTTON_ENTITY.TYPE) {
+          return [
+            200,
+            options.replyQueryContextWithData.buttonDescriptor
+          ];
+        } else if (requestBodyObj.entities[0].type === caConfig.SERVICE_ENTITY.TYPE) {
+          return [
+            200,
+            options.replyQueryContextWithData.serviceDescriptor
+          ];
+        }
       }
     );
   }
@@ -533,15 +637,17 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
-            {
-              contextResponses: {
-                contextElement: {
-                  id: false
+          replyQueryContextWithData: {
+            serviceDescriptor: getServiceDescriptorResponse(
+              {
+                contextResponses: {
+                  contextElement: {
+                    id: false
+                  }
                 }
               }
-            }
-          ),
+            )
+          },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
             resultPrefix: '0'
@@ -573,15 +679,17 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
-            {
-              contextResponses: {
-                contextElement: {
-                  type: false
+          replyQueryContextWithData: {
+            serviceDescriptor: getServiceDescriptorResponse(
+              {
+                contextResponses: {
+                  contextElement: {
+                    type: false
+                  }
                 }
               }
-            }
-          ),
+            )
+          },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
             resultPrefix: '0'
@@ -613,15 +721,17 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
-            {
-              contextResponses: {
-                contextElement: {
-                  isPattern: false
+          replyQueryContextWithData: {
+            serviceDescriptor: getServiceDescriptorResponse(
+              {
+                contextResponses: {
+                  contextElement: {
+                    isPattern: false
+                  }
                 }
               }
-            }
-          ),
+            )
+          },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
             resultPrefix: '0'
@@ -653,15 +763,17 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
-            {
-              contextResponses: {
-                contextElement: {
-                  attributes: [caConfig.SERVICE_ENTITY.PROVIDER_ATTR_NAME]
+          replyQueryContextWithData: {
+            serviceDescriptor: getServiceDescriptorResponse(
+              {
+                contextResponses: {
+                  contextElement: {
+                    attributes: [caConfig.SERVICE_ENTITY.PROVIDER_ATTR_NAME]
+                  }
                 }
               }
-            }
-          ),
+            )
+          },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
             resultPrefix: '0'
@@ -693,15 +805,17 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
-            {
-              contextResponses: {
-                contextElement: {
-                  attributes: [caConfig.SERVICE_ENTITY.INTERACTION_TYPE_ATTR_NAME]
+          replyQueryContextWithData: {
+            serviceDescriptor: getServiceDescriptorResponse(
+              {
+                contextResponses: {
+                  contextElement: {
+                    attributes: [caConfig.SERVICE_ENTITY.INTERACTION_TYPE_ATTR_NAME]
+                  }
                 }
               }
-            }
-          ),
+            )
+          },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
             resultPrefix: '0'
@@ -733,15 +847,17 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
-            {
-              contextResponses: {
-                contextElement: {
-                  attributes: [caConfig.SERVICE_ENTITY.ENDPOINT_ATTR_NAME]
+          replyQueryContextWithData: {
+            serviceDescriptor: getServiceDescriptorResponse(
+              {
+                contextResponses: {
+                  contextElement: {
+                    attributes: [caConfig.SERVICE_ENTITY.ENDPOINT_ATTR_NAME]
+                  }
                 }
               }
-            }
-          ),
+            )
+          },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
             resultPrefix: '0'
@@ -773,15 +889,17 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
-            {
-              contextResponses: {
-                contextElement: {
-                  attributes: [caConfig.SERVICE_ENTITY.METHOD_ATTR_NAME]
+          replyQueryContextWithData: {
+            serviceDescriptor: getServiceDescriptorResponse(
+              {
+                contextResponses: {
+                  contextElement: {
+                    attributes: [caConfig.SERVICE_ENTITY.METHOD_ATTR_NAME]
+                  }
                 }
               }
-            }
-          ),
+            )
+          },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
             resultPrefix: '0'
@@ -813,15 +931,17 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
-            {
-              contextResponses: {
-                contextElement: {
-                  attributes: [caConfig.SERVICE_ENTITY.AUTHENTICATION_ATTR_NAME]
+          replyQueryContextWithData: {
+            serviceDescriptor: getServiceDescriptorResponse(
+              {
+                contextResponses: {
+                  contextElement: {
+                    attributes: [caConfig.SERVICE_ENTITY.AUTHENTICATION_ATTR_NAME]
+                  }
                 }
               }
-            }
-          ),
+            )
+          },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
             resultPrefix: '0'
@@ -853,15 +973,17 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
-            {
-              contextResponses: {
-                contextElement: {
-                  attributes: [caConfig.SERVICE_ENTITY.MAPPING_ATTR_NAME]
+          replyQueryContextWithData: {
+            serviceDescriptor: getServiceDescriptorResponse(
+              {
+                contextResponses: {
+                  contextElement: {
+                    attributes: [caConfig.SERVICE_ENTITY.MAPPING_ATTR_NAME]
+                  }
                 }
               }
-            }
-          ),
+            )
+          },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
             resultPrefix: '0'
@@ -893,15 +1015,17 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: getServiceDescriptorResponse(
-            {
-              contextResponses: {
-                contextElement: {
-                  attributes: [caConfig.SERVICE_ENTITY.TIMEOUT_ATTR_NAME]
+          replyQueryContextWithData: {
+            serviceDescriptor: getServiceDescriptorResponse(
+              {
+                contextResponses: {
+                  contextElement: {
+                    attributes: [caConfig.SERVICE_ENTITY.TIMEOUT_ATTR_NAME]
+                  }
                 }
               }
-            }
-          ),
+            )
+          },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
             resultPrefix: '0'
@@ -933,7 +1057,9 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: serviceDescriptorResponse
+          replyQueryContextWithData: {
+            serviceDescriptor: serviceDescriptorResponse
+          }
         }
       );
 
@@ -968,7 +1094,9 @@ function operationTestSuite(updateContextPayload, interactionType) {
     function(done) {
       nockContextBroker(
         {
-          replyQueryContextWithServiceDescriptor: serviceDescriptorResponse,
+          replyQueryContextWithData: {
+            serviceDescriptor: serviceDescriptorResponse,
+          },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
             resultPrefix: '0'
@@ -1013,14 +1141,26 @@ function operationTestSuite(updateContextPayload, interactionType) {
         return done();
       }
 
-      nockContextBroker(
-        {
-          replyQueryContextWithServiceDescriptor: serviceDescriptorResponse,
-          statusNotification: {
-            status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.COMPLETED,
-            resultPrefix: '1'
-          }
+      var nockContextBrokerOptions = {
+        replyQueryContextWithData: {
+          serviceDescriptor: serviceDescriptorResponse
         },
+        statusNotification: {
+          resultPrefix: '1'
+        }
+      };
+
+      if (updateContextPayload && updateContextPayload.contextElements && updateContextPayload.contextElements[0] &&
+        updateContextPayload.contextElements[0].attributes &&
+        caHelper.getAttributeValue(
+          updateContextPayload.contextElements[0].attributes,
+          caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME
+        ) === caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS) {
+        nockContextBrokerOptions.statusNotification.status = caConfig.BUTTON_ENTITY.OPERATION_STATUS.COMPLETED;
+      }
+
+      nockContextBroker(
+        nockContextBrokerOptions,
         done
       );
 
@@ -1056,32 +1196,46 @@ function operationTestSuite(updateContextPayload, interactionType) {
 
   it('should notify the ' + interactionType + ' request as \'completed\' if the third party sends a request ' +
       'to the Context Adapter callback url with the request\'s results ' +
-      '(only applies to synchronous third party services)', function(done) {
+      '(only applies to asynchronous third party services)', function(done) {
     if (interactionType === caConfig.SERVICE_ENTITY.INTERACTION_TYPES.SYNCHRONOUS) {
       return done();
     }
 
-    // Nock the Context Broker to listen for:
-    //  1. The \'completed\' status notification via an updateContext request
-    nock(
-      'http://' + caConfig.CB_HOST + ':' + caConfig.CB_PORT
-    ).post(
-      caConfig.CB_PATH + '/updateContext'
-    ).reply(function(uri, requestBody) {
-        // The updateContext request should include a operation status attribute set
-        //  to closed
-        expect(caHelper.getAttributeValue(
-          JSON.parse(requestBody).contextElements[0].attributes,
-          caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME)).to.equal(
-          caConfig.BUTTON_ENTITY.OPERATION_STATUS.COMPLETED
-        );
-        // The updateContext request should include a operation result attribute
-        //  starting with '0'
-        expect(caHelper.getAttributeValue(
-          JSON.parse(requestBody).contextElements[0].attributes,
-          caConfig.BUTTON_ENTITY.OPERATION_RESULT_ATTR_NAME).indexOf('1')).to.equal(0);
-        done();
+    var nockContextBrokerOptions = {
+      replyQueryContextWithData: {
+        serviceDescriptor: serviceDescriptorResponse,
+      },
+      statusNotification: {
+        resultPrefix: '1'
       }
+    };
+
+    if (updateContextPayload && updateContextPayload.contextElements && updateContextPayload.contextElements[0] &&
+      updateContextPayload.contextElements[0].attributes &&
+      caHelper.getAttributeValue(
+        updateContextPayload.contextElements[0].attributes,
+        caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME
+      ) === caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS) {
+      nockContextBrokerOptions.statusNotification.status = caConfig.BUTTON_ENTITY.OPERATION_STATUS.COMPLETED;
+    }
+
+    var finalButtonDescriptor = getButtonDescriptorResponse();
+    caHelper.setAttribute(
+      finalButtonDescriptor.contextResponses[0].contextElement.attributes,
+      caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+      caHelper.getAttributeValue(
+        updateContextPayload.contextElements[0].attributes,
+        caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME
+      )
+    );
+
+    if (interactionType === caConfig.SERVICE_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS) {
+      nockContextBrokerOptions.replyQueryContextWithData.buttonDescriptor = finalButtonDescriptor;
+    }
+
+    nockContextBroker(
+      nockContextBrokerOptions,
+      done
     );
 
     request(
