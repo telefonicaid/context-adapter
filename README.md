@@ -31,19 +31,14 @@ following one:
           isPattern: false,
           attributes: [
             {
-              name: caConfig.BUTTON_ENTITY.CA_EXTERNAL_ID_ATTR_NAME,
-              type: 'string',
-              value: '<aux-external-id>'
-            },
-            {
               name: caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME,
               type: 'string',
               value: '<aux-service-id>'
             },
             {
-              name: caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME,
+              name: caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
               type: 'string',
-              value: 'S | C'
+              value: 'synchronous | asynchronous'
             },
             {
               name: caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME,
@@ -68,7 +63,6 @@ should have a payload such as the following one:
 <pre>
     {
       buttonId: <button-id>,
-      externalButtonId: <external-button-id>,
       serviceId: <service-id>,
       action: <action>,
       extra: <extra>,
