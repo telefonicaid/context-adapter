@@ -1,0 +1,56 @@
+{
+  "name": "context-adapter",
+  "description": "Context Adapter component for the Black Button (Generic Button) platform by Telefónica.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/telefonicaid/context-adapter",
+  "author": {
+    "name": "Germán Toro del Valle",
+    "email": "gtorodelvalle@gmail.com",
+    "url": "https://www.linkedin.com/in/gtorodelvalle"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/telefonicaid/context-adapter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/telefonicaid/context-adapter/issues"
+  },
+  "main": "lib/context-adapter",
+  "engines": {
+    "node": ">=0.10.22"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "chai": "~1.8.0",
+    "grunt": "~0.4.1",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-jshint": "~0.6.4",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-dox": "~0.5.0",
+    "grunt-exec": "~0.4.0",
+    "grunt-githooks": "~0.3.1",
+    "grunt-github-pages": "~0.0.3",
+    "grunt-gjslint": "~0.1.0",
+    "grunt-mkdir": "~0.1.1",
+    "grunt-mocha-test": "~0.7.0",
+    "grunt-plato": "~0.2.0",
+    "istanbul": "~0.3.2",
+    "mocha": "~1.13.0",
+    "nock": "^2.10.0",
+    "proxyquire": "0.5.1",
+    "sinon": "~1.7.3",
+    "sinon-chai": "2.4.0"
+  },
+  "keywords": [],
+  "dependencies": {
+    "async": "^1.4.2",
+    "boom": "^2.8.0",
+    "hapi": "^8.8.1",
+    "logops": "^0.5.0",
+    "mkdirp": "^0.5.1",
+    "request": "^2.60.0",
+    "revalidator": "^0.3.1"
+  }
+}
