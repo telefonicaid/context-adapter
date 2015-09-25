@@ -38,8 +38,8 @@
 . /etc/rc.d/init.d/functions
 
 PARAM=$1
-NAME=iotatt
-EXECUTABLE=bin/context-adapter.js
+NAME=context-adapter
+EXECUTABLE=bin/context-adapter
 CA_PATH=/opt/contextAdapter
 PIDFILE=$CA_PATH/$NAME.pid
 LOG_PATH=/var/log/contextAdapter/contextAdapter.log
