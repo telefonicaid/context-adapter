@@ -145,6 +145,9 @@ The Context Adapter component is a Node.js application which depends on certain 
 [Top](#section0)
 
 ##<a id="section3"></a> Installation
+The Context Adapter can be installed in two ways: using the RPM or cloning the Github repository.
+
+### Cloning the Github Repository
 1. Clone the repository:
 <pre> git clone https://github.com/telefonicaid/context-adapter.git </pre>
 2. Get into the directory where the Context Adapter repository has been cloned:
@@ -153,6 +156,20 @@ The Context Adapter component is a Node.js application which depends on certain 
 <pre> npm install </pre>
 The Context Adapter component server is ready to be started.
 
+### Using the RPM
+The project contains a script for generating an RPM that can be installed in Red Hat 6.5 compatible Linux distributions. The
+RPM depends on Node.js 0.10 version, so EPEL repositories are advisable. 
+
+In order to create the RPM, execute the following script, inside the `/rpm` folder:
+```
+create-rpm.sh -v <versionNumber> -r <releaseNumber>
+```
+
+
+Once the RPM is generated, it can be installed using the following command:
+```
+yum localinstall --nogpg <nameOfTheRPM>.rpm
+```
 [Top](#section0)
 
 ##<a id="section4"></a>Running the Context Adapter
