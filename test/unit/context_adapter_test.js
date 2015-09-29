@@ -42,7 +42,7 @@ describe('Context Adapter server:', function() {
   });
 
   it('should start the Context Adapter:', function(done) {
-    contextAdapter.start(false, function(err) {
+    contextAdapter.start(function(err) {
       expect(err).to.equal(undefined);
       expect(contextAdapter.server.hapiServer).to.be.an.instanceof(hapi.Server);
       done();
