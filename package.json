@@ -1,7 +1,7 @@
 {
   "name": "context-adapter",
   "description": "Context Adapter component for the Black Button (Generic Button) platform by Telefónica.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/telefonicaid/context-adapter",
   "author": {
     "name": "Germán Toro del Valle",
