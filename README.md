@@ -187,6 +187,7 @@ It is important to note that environment variables, if set, take precedence over
 The script accepts the following parameters as environment variables:
 
 - CA_HOST: The host where the Context Adapter server will be started. Optional. Default value: "localhost".
+- CA_PUBLIC_HOST: The public host or IP where the Context Adapter server will be listening. Default value: "127.0.0.1".
 - CA_PORT: The port where the Context Adapter server will be listening. Optional. Default value: "9999".
 - CA_PATH: The path to add to the routes where the Context Broker is attending requests. Optional. Default value: "/v1".
 - LOGOPS_LEVEL: The logging level of the messages. Messages with a level equal or superior to this will be logged.
