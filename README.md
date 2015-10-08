@@ -1,5 +1,7 @@
 #<a id="section0"></a> Context Adapter
 
+[![Join the chat at https://gitter.im/telefonicaid/context-adapter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/telefonicaid/context-adapter?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 * [Introduction] (#section1)
 * [Dependencies](#section2)
 * [Installation](#section3)
