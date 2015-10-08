@@ -70,6 +70,9 @@ if [ "$RET_VAL" != "0" ]; then
          echo "[ERROR] Unable create %{_project_user} user" \
          exit $RET_VAL
       fi
+else
+      mv %{_install_dir}/config.js /tmp/config-ca-tmp.js
+
 fi
 
 # -------------------------------------------------------------------------------------------- #
@@ -99,6 +102,12 @@ echo "[INFO] Configuring application"
     cd /etc/init.d
     chkconfig --add %{_service_name}
 
+    ls /tmp/config-ca-tmp.js
+    RET_VAL=$?
+
+    if [ "$RET_VAL" == "0" ]; then
+        mv /tmp/config-ca-tmp.js %{_install_dir}/config.js
+    fi
 echo "Done"
 
 # -------------------------------------------------------------------------------------------- #
