@@ -44,7 +44,12 @@
     defaultService: 'blackbutton',
     // The service path to be used if not sent by the Context Broker in the interchanged messages.
     //  Default value: "/".
-    defaultServicePath: '/'
+    defaultServicePath: '/',
+    // The Context Adapter supports 2 modes of operation: 1) It can act as a context provider receiving the redirected
+    //  updateContext requests received by the Context Broker as a consequence of new clicks of buttons (to set this
+    //  operation mode set the 'mode' configuration option to 'context-provider' and 2) Being notified by the
+    //  Context Broker of new button clicks. Default value: 'notification'.
+    mode: 'notification'
   };
 
 // Logging configuration

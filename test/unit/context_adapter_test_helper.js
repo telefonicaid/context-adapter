@@ -114,6 +114,101 @@ function getUpdateContextPayload(options) {
 
 /**
  * Returns a valid and well-formed or invalid and not well-formed
+ *  notification request depending on the options passed
+ * @param {object} options Object including the properties which should
+ *  be excluded from the final returned payload. For example, if options is:
+ *  {
+   *    contextElements: {
+   *      id: false,
+   *      isPattern: false,
+   *      attributes: [
+   *        caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME
+   *      ]
+   *    },
+   *    updateAction: false
+   *  }
+ *  the returned payload will not include an id, isPattern properties or
+ *  the specified attributes in the contextElements entry, or an updateAction
+ *  property.
+ * @return {object} The updateContext request payload
+ */
+function getNotificationPayload(options) {
+  var payload = {
+    contextResponses: [
+      {
+        contextElement: {
+          id: '<device-id>',
+          type: caConfig.BUTTON_ENTITY.TYPE,
+          isPattern: 'false',
+          attributes: [
+            {
+              name: caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+              type: 'string',
+              value: '<aux-interaction-type>'
+            },
+            {
+              name: caConfig.BUTTON_ENTITY.SERVICE_ID_ATTR_NAME,
+              type: 'string',
+              value: '<aux-service-id>'
+            },
+            {
+              name: caConfig.BUTTON_ENTITY.OPERATION_ACTION_ATTR_NAME,
+              type: 'string',
+              value: '<aux-op-action>'
+            },
+            {
+              name: caConfig.BUTTON_ENTITY.OPERATION_EXTRA_ATTR_NAME,
+              type: 'string',
+              value: '<aux-op-extra>'
+            },
+            {
+              name: caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME,
+              type: 'string',
+              value: '<aux-op-status>'
+            }
+          ]
+        },
+        statusCode: {
+          code: '200',
+          reasonPhrase: 'OK'
+        }
+      }
+    ]
+  };
+  if (options && options.contextResponses && options.contextResponses.length) {
+    if (options.contextResponses[0].contextElement) {
+      if (options.contextResponses[0].contextElement.id === false) {
+        delete payload.contextResponses[0].contextElement.id;
+      }
+      if (options.contextResponses[0].contextElement.type === false) {
+        delete payload.contextResponses[0].contextElement.type;
+      }
+      if (options.contextResponses[0].contextElement.isPattern === false) {
+        delete payload.contextResponses[0].contextElement.isPattern;
+      }
+      if (options.contextResponses[0].contextElement.attributes &&
+        Array.isArray(options.contextResponses[0].contextElement.attributes)) {
+        for (var i = 0; i < options.contextResponses[0].contextElement.attributes.length; i++) {
+          caHelper.removeAttribute(
+            payload.contextResponses[0].contextElement.attributes,
+            options.contextResponses[0].contextElement.attributes[i]);
+        }
+      }
+    }
+    if (options.contextResponses[0].statusCode) {
+      if (options.contextResponses[0].statusCode.code === false) {
+        delete payload.contextResponses[0].statusCode.code;
+      }
+      if (options.contextResponses[0].statusCode.reasonPhrase === false) {
+        delete payload.contextResponses[0].statusCode.reasonPhrase;
+      }
+    }
+  }
+  return payload;
+}
+
+/**
+ * Returns a valid and well-formed or invalid and not well-formed
  *  button descriptor response to a previous queryContext request
  *  depending on the options passed
  * @param {object} options Object including the properties which should
@@ -489,13 +584,13 @@ function nockContextBroker(options, done) {
 
 /**
  * Main test suite covering the Context Adapter operation
- * @param updateContextPayload The updateContext payload received by the Context Adapter
+ * @param payload The payload received by the Context Adapter
  * @param serviceDescriptorResponse The service descriptor queried to the Context Broker
  * @param endpointDomain The endpoint domain where the Third Party is listening
  * @param endpointPath The endpoint path where the Third Party is listening
  * @param method The method to be used in the requests sent to the Third Party
  */
-function operationTestSuite(updateContextPayload, interactionType) {
+function operationTestSuite(payload, interactionType) {
   // Generate a service descriptor response having 'http://thirdparty.com/service' as endpoint and
   //  'GET' as method
   var endpointDomain = 'http://thirdparty.com',
@@ -525,7 +620,7 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
@@ -554,11 +649,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -586,11 +681,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -617,11 +712,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -659,11 +754,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -701,11 +796,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -743,11 +838,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -785,11 +880,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -827,11 +922,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -869,11 +964,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -911,11 +1006,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -953,11 +1048,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -995,11 +1090,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -1037,11 +1132,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -1074,11 +1169,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -1095,7 +1190,7 @@ function operationTestSuite(updateContextPayload, interactionType) {
       nockContextBroker(
         {
           replyQueryContextWithData: {
-            serviceDescriptor: serviceDescriptorResponse,
+            serviceDescriptor: serviceDescriptorResponse
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
@@ -1119,11 +1214,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -1150,12 +1245,20 @@ function operationTestSuite(updateContextPayload, interactionType) {
         }
       };
 
-      if (updateContextPayload && updateContextPayload.contextElements && updateContextPayload.contextElements[0] &&
-        updateContextPayload.contextElements[0].attributes &&
-        caHelper.getAttributeValue(
-          updateContextPayload.contextElements[0].attributes,
-          caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME
-        ) === caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS) {
+      if (payload &&
+        ((payload.contextElements && payload.contextElements[0] &&
+          payload.contextElements[0].attributes &&
+          caHelper.getAttributeValue(
+            payload.contextElements[0].attributes,
+            caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME
+          ) === caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS) ||
+        (payload.contextResponses && payload.contextResponses[0].contextElement &&
+          payload.contextResponses[0].contextElement &&
+          payload.contextResponses[0].contextElement.attributes &&
+          caHelper.getAttributeValue(
+            payload.contextResponses[0].contextElement.attributes,
+            caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME
+          ) === caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS))) {
         nockContextBrokerOptions.statusNotification.status = caConfig.BUTTON_ENTITY.OPERATION_STATUS.COMPLETED;
       }
 
@@ -1179,11 +1282,11 @@ function operationTestSuite(updateContextPayload, interactionType) {
       request(
         getRequestOptions(
           {
-            body: updateContextPayload
+            body: payload
           }
         ),
         function(err, response, body) {
-          // The Context Adapter should reply successfully to the updateContext request as
+          // The Context Adapter should reply successfully to the request as
           //  soon as it validates it
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -1203,31 +1306,49 @@ function operationTestSuite(updateContextPayload, interactionType) {
 
     var nockContextBrokerOptions = {
       replyQueryContextWithData: {
-        serviceDescriptor: serviceDescriptorResponse,
+        serviceDescriptor: serviceDescriptorResponse
       },
       statusNotification: {
         resultPrefix: '1'
       }
     };
 
-    if (updateContextPayload && updateContextPayload.contextElements && updateContextPayload.contextElements[0] &&
-      updateContextPayload.contextElements[0].attributes &&
+    if (payload &&
+      ((payload.contextElements && payload.contextElements[0] &&
+        payload.contextElements[0].attributes &&
+        caHelper.getAttributeValue(
+          payload.contextElements[0].attributes,
+          caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME
+        ) === caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS) ||
+      (payload.contextResponses && payload.contextResponses[0] &&
+      payload.contextResponses[0].contextElement.attributes &&
       caHelper.getAttributeValue(
-        updateContextPayload.contextElements[0].attributes,
-        caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME
-      ) === caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS) {
+        payload.contextResponses[0].contextElement.attributes,
+        caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME
+      ) === caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS))) {
       nockContextBrokerOptions.statusNotification.status = caConfig.BUTTON_ENTITY.OPERATION_STATUS.COMPLETED;
     }
 
     var finalButtonDescriptor = getButtonDescriptorResponse();
-    caHelper.setAttribute(
-      finalButtonDescriptor.contextResponses[0].contextElement.attributes,
-      caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
-      caHelper.getAttributeValue(
-        updateContextPayload.contextElements[0].attributes,
-        caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME
-      )
-    );
+    if (payload && payload.contextElements && payload.contextElements[0] && payload.contextElements[0].attributes) {
+      caHelper.setAttribute(
+        finalButtonDescriptor.contextResponses[0].contextElement.attributes,
+        caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+        caHelper.getAttributeValue(
+          payload.contextElements[0].attributes,
+          caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME
+        )
+      );
+    } else {
+      caHelper.setAttribute(
+        finalButtonDescriptor.contextResponses[0].contextElement.attributes,
+        caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+        caHelper.getAttributeValue(
+          payload.contextResponses[0].contextElement.attributes,
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME
+        )
+      );
+    }
 
     if (interactionType === caConfig.SERVICE_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS) {
       nockContextBrokerOptions.replyQueryContextWithData.buttonDescriptor = finalButtonDescriptor;
@@ -1269,6 +1390,7 @@ function operationTestSuite(updateContextPayload, interactionType) {
  */
 module.exports = {
   getUpdateContextPayload: getUpdateContextPayload,
+  getNotificationPayload: getNotificationPayload,
   getServiceDescriptorResponse: getServiceDescriptorResponse,
   getRequestOptions: getRequestOptions,
   nockContextBroker: nockContextBroker,
