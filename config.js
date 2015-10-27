@@ -35,7 +35,7 @@
     host: 'localhost',
     // The public host or IP where the Context Adapter server will be listening. Default value: "127.0.0.1".
     publicHost: '127.0.0.1',
-    // The port where the Context Adapter server will be listening. Default value: "8666".
+    // The port where the Context Adapter server will be listening. Default value: "9999".
     port: '9999',
     // The path where the Context Adapter server will be expecting requests. Default value: "/v1".
     path: '/v1',
