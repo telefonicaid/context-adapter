@@ -470,7 +470,9 @@ function getRequestOptions(options) {
  *      },
  *      statusNotification: {
  *        status: 'closed',
- *        resultPrefix: '0'
+ *        result: {
+ *          code: '200'
+ *        }
  *      }
  *    }
  *  will make the nocked Context Broker to allow unmocked operations, to reply with an error, an NGSI error or
@@ -558,13 +560,12 @@ function nockContextBroker(options, done) {
             options.statusNotification.status
           );
         }
-        if (options.statusNotification.resultPrefix) {
+        if (options.statusNotification.result) {
           // The updateContext request should include a operation result attribute
           //  starting with '0'
-          expect(caHelper.getAttributeValue(
+          expect(JSON.parse(caHelper.getAttributeValue(
             JSON.parse(requestBody).contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.OPERATION_RESULT_ATTR_NAME).indexOf(
-            options.statusNotification.resultPrefix)).to.equal(0);
+            caConfig.BUTTON_ENTITY.OPERATION_RESULT_ATTR_NAME)).code).to.equal(options.statusNotification.result.code);
         }
         if (options.statusNotification.attributes &&
           Array.isArray(options.statusNotification.attributes)) {
@@ -640,7 +641,9 @@ function operationTestSuite(payload, interactionType) {
           allowUnmocked: true,
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -672,7 +675,9 @@ function operationTestSuite(payload, interactionType) {
           replyQueryContextWithError: true,
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -703,7 +708,9 @@ function operationTestSuite(payload, interactionType) {
           replyQueryContextWithNGSICode: true,
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -745,7 +752,9 @@ function operationTestSuite(payload, interactionType) {
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -787,7 +796,9 @@ function operationTestSuite(payload, interactionType) {
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -829,7 +840,9 @@ function operationTestSuite(payload, interactionType) {
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -871,7 +884,9 @@ function operationTestSuite(payload, interactionType) {
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -913,7 +928,9 @@ function operationTestSuite(payload, interactionType) {
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -955,7 +972,9 @@ function operationTestSuite(payload, interactionType) {
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -997,7 +1016,9 @@ function operationTestSuite(payload, interactionType) {
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -1039,7 +1060,9 @@ function operationTestSuite(payload, interactionType) {
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -1081,7 +1104,9 @@ function operationTestSuite(payload, interactionType) {
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -1123,7 +1148,9 @@ function operationTestSuite(payload, interactionType) {
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -1194,7 +1221,9 @@ function operationTestSuite(payload, interactionType) {
           },
           statusNotification: {
             status: caConfig.BUTTON_ENTITY.OPERATION_STATUS.CLOSED,
-            resultPrefix: '0'
+            result: {
+              code: caConfig.RESULT_CODES.ERROR
+            }
           }
         },
         done
@@ -1241,7 +1270,9 @@ function operationTestSuite(payload, interactionType) {
           serviceDescriptor: serviceDescriptorResponse
         },
         statusNotification: {
-          resultPrefix: '1'
+          result: {
+            code: caConfig.RESULT_CODES.SUCCESS
+          }
         }
       };
 
@@ -1309,7 +1340,9 @@ function operationTestSuite(payload, interactionType) {
         serviceDescriptor: serviceDescriptorResponse
       },
       statusNotification: {
-        resultPrefix: '1'
+        result: {
+          code: caConfig.RESULT_CODES.SUCCESS
+        }
       }
     };
 
