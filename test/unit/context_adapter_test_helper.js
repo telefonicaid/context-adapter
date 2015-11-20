@@ -563,9 +563,9 @@ function nockContextBroker(options, done) {
         if (options.statusNotification.result) {
           // The updateContext request should include a operation result attribute
           //  starting with '0'
-          expect(JSON.parse(caHelper.getAttributeValue(
+          expect(JSON.parse(caHelper.decodeResponse(caHelper.getAttributeValue(
             JSON.parse(requestBody).contextElements[0].attributes,
-            caConfig.BUTTON_ENTITY.OPERATION_RESULT_ATTR_NAME)).code).to.equal(options.statusNotification.result.code);
+            caConfig.BUTTON_ENTITY.OPERATION_RESULT_ATTR_NAME))).code).to.equal(options.statusNotification.result.code);
         }
         if (options.statusNotification.attributes &&
           Array.isArray(options.statusNotification.attributes)) {
