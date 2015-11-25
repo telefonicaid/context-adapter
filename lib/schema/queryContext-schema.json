@@ -1,0 +1,75 @@
+{
+  "properties": {
+    "body": {
+      "id": "body",
+      "type": "object",
+      "required": true,
+      "properties": {
+        "contextResponses": {
+          "id": "contextResponses",
+          "type": "array",
+          "required": true,
+          "minItems": 0,
+          "maxItems": 2,
+          "items": {
+            "id": "0",
+            "type": "object",
+            "required": true,
+            "properties": {
+              "contextElement": {
+                "id": "contextElement",
+                "type": "object",
+                "required": true,
+                "properties": {
+                  "id": {
+                    "id": "id",
+                    "type": "string",
+                    "required": true
+                  },
+                  "type": {
+                    "id": "type",
+                    "type": "string",
+                    "required": true
+                  },
+                  "isPattern": {
+                    "id": "isPattern",
+                    "type": "string",
+                    "required": true,
+                    "pattern": "false"
+                  },
+                  "attributes": {
+                    "id": "attributes",
+                    "type": "array",
+                    "required": true,
+                    "minItems": 6,
+                    "maxItems": 8,
+                    "message": "lacks some mandatory attributes or invalid values are included"
+                  }
+                }
+              },
+              "statusCode": {
+                "id": "statusCode",
+                "type": "object",
+                "required": true,
+                "properties": {
+                  "code": {
+                    "id": "code",
+                    "type": "string",
+                    "required": true,
+                    "pattern": "200"
+                  },
+                  "reasonPhrase": {
+                    "id": "code",
+                    "type": "string",
+                    "required": true,
+                    "pattern": "OK"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
