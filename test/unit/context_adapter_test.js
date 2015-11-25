@@ -163,19 +163,86 @@ describe('Context Adapter server:', function() {
       );
     });
 
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s id',
-      function(done) {
+    if (caConfig.CA_MODE === caConfig.MODES.CONTEXT_PROVIDER) {
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s id',
+        function (done) {
+          request(
+            testHelper.getRequestOptions(
+              {
+                body: testHelper.getUpdateContextPayload({
+                  contextElements: {
+                    id: false
+                  }
+                })
+              }
+            ),
+            function (err, response, body) {
+              expect(err).to.equal(null);
+              expect(response.statusCode).to.equal(200);
+              expect(body.contextResponses[0].statusCode.code).to.equal('400');
+              expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+              done();
+            }
+          );
+        });
+
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s type',
+        function (done) {
+          request(
+            testHelper.getRequestOptions(
+              {
+                body: testHelper.getUpdateContextPayload({
+                  contextElements: {
+                    type: false
+                  }
+                })
+              }
+            ),
+            function (err, response, body) {
+              expect(err).to.equal(null);
+              expect(response.statusCode).to.equal(200);
+              expect(body.contextResponses[0].statusCode.code).to.equal('400');
+              expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+              done();
+            }
+          );
+        });
+
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s isPattern',
+        function (done) {
+          request(
+            testHelper.getRequestOptions(
+              {
+                body: testHelper.getUpdateContextPayload({
+                  contextElements: {
+                    isPattern: false
+                  }
+                })
+              }
+            ),
+            function (err, response, body) {
+              expect(err).to.equal(null);
+              expect(response.statusCode).to.equal(200);
+              expect(body.contextResponses[0].statusCode.code).to.equal('400');
+              expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+              done();
+            }
+          );
+        });
+
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME + ' attribute', function (done) {
         request(
           testHelper.getRequestOptions(
             {
               body: testHelper.getUpdateContextPayload({
                 contextElements: {
-                  id: false
+                  attributes: [caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME]
                 }
               })
             }
           ),
-          function(err, response, body) {
+          function (err, response, body) {
             expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
             expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -185,19 +252,19 @@ describe('Context Adapter server:', function() {
         );
       });
 
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s type',
-      function(done) {
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME + ' attribute', function (done) {
         request(
           testHelper.getRequestOptions(
             {
               body: testHelper.getUpdateContextPayload({
                 contextElements: {
-                  type: false
+                  attributes: [caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME]
                 }
               })
             }
           ),
-          function(err, response, body) {
+          function (err, response, body) {
             expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
             expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -207,19 +274,19 @@ describe('Context Adapter server:', function() {
         );
       });
 
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s isPattern',
-      function(done) {
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME + ' attribute', function (done) {
         request(
           testHelper.getRequestOptions(
             {
               body: testHelper.getUpdateContextPayload({
                 contextElements: {
-                  isPattern: false
+                  attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME]
                 }
               })
             }
           ),
-          function(err, response, body) {
+          function (err, response, body) {
             expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
             expect(body.contextResponses[0].statusCode.code).to.equal('400');
@@ -229,213 +296,459 @@ describe('Context Adapter server:', function() {
         );
       });
 
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME + ' attribute', function(done) {
-      request(
-        testHelper.getRequestOptions(
-          {
-            body: testHelper.getUpdateContextPayload({
-              contextElements: {
-                attributes: [caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME]
-              }
-            })
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME + ' attribute', function (done) {
+        var updateContextPayload = testHelper.getUpdateContextPayload({
+          contextElements: {
+            attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME]
           }
-        ),
-        function(err, response, body) {
-          expect(err).to.equal(null);
-          expect(response.statusCode).to.equal(200);
-          expect(body.contextResponses[0].statusCode.code).to.equal('400');
-          expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
-          done();
-        }
-      );
-    });
-
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME + ' attribute', function(done) {
-      request(
-        testHelper.getRequestOptions(
-          {
-            body: testHelper.getUpdateContextPayload({
-              contextElements: {
-                attributes: [caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME]
-              }
-            })
-          }
-        ),
-        function(err, response, body) {
-          expect(err).to.equal(null);
-          expect(response.statusCode).to.equal(200);
-          expect(body.contextResponses[0].statusCode.code).to.equal('400');
-          expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
-          done();
-        }
-      );
-    });
-
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME + ' attribute', function(done) {
-      request(
-        testHelper.getRequestOptions(
-          {
-            body: testHelper.getUpdateContextPayload({
-              contextElements: {
-                attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME]
-              }
-            })
-          }
-        ),
-        function(err, response, body) {
-          expect(err).to.equal(null);
-          expect(response.statusCode).to.equal(200);
-          expect(body.contextResponses[0].statusCode.code).to.equal('400');
-          expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
-          done();
-        }
-      );
-    });
-
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME + ' attribute', function(done) {
-      var updateContextPayload = testHelper.getUpdateContextPayload({
-        contextElements: {
-          attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME]
-        }
-      });
-      caHelper.setAttribute(
-        updateContextPayload.contextElements[0].attributes,
-        caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
-        caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
-      );
-
-      request(
-        testHelper.getRequestOptions(
-          {
-            body: updateContextPayload
-          }
-        ),
-        function(err, response, body) {
-          expect(err).to.equal(null);
-          expect(response.statusCode).to.equal(200);
-          expect(body.contextResponses[0].statusCode.code).to.equal('400');
-          expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
-          done();
-        }
-      );
-    });
-
-    it('should respond with a 200 code and OK reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME + ' attribute and synchronous ' +
-      'button operation', function(done) {
-      var updateContextPayload = testHelper.getUpdateContextPayload({
-        contextElements: {
-          attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME]
-        }
-      });
-      caHelper.setAttribute(
-        updateContextPayload.contextElements[0].attributes,
-        caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
-        caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
-      );
-
-      request(
-        testHelper.getRequestOptions(
-          {
-            body: updateContextPayload
-          }
-        ),
-        function(err, response, body) {
-          expect(err).to.equal(null);
-          expect(response.statusCode).to.equal(200);
-          expect(body.contextResponses[0].statusCode.code).to.equal('200');
-          expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
-          done();
-        }
-      );
-    });
-
-    it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
-      caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME + ' attribute and asynchronous ' +
-      'button operation',  function(done) {
-      var updateContextPayload = testHelper.getUpdateContextPayload({
-        contextElements: {
-          attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME]
-        }
-      });
-      caHelper.setAttribute(
-        updateContextPayload.contextElements[0].attributes,
-        caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
-        caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS
-      );
-
-      request(
-        testHelper.getRequestOptions(
-          {
-            body: updateContextPayload
-          }
-        ),
-        function(err, response, body) {
-          expect(err).to.equal(null);
-          expect(response.statusCode).to.equal(200);
-          expect(body.contextResponses[0].statusCode.code).to.equal('400');
-          expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
-          done();
-        }
-      );
-    });
-
-    describe('Synchronous button operation requests:', function() {
-      var updateContextPayload = testHelper.getUpdateContextPayload();
-
-      beforeEach(function() {
+        });
         caHelper.setAttribute(
           updateContextPayload.contextElements[0].attributes,
           caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
-          caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS);
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
+        );
+
+        request(
+          testHelper.getRequestOptions(
+            {
+              body: updateContextPayload
+            }
+          ),
+          function (err, response, body) {
+            expect(err).to.equal(null);
+            expect(response.statusCode).to.equal(200);
+            expect(body.contextResponses[0].statusCode.code).to.equal('400');
+            expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+            done();
+          }
+        );
       });
 
-      describe('Synchronous third party service:',
-        testHelper.operationTestSuite.bind(
-          null,
-          updateContextPayload,
-          caConfig.SERVICE_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
-        )
-      );
-
-      describe('Asynchronous third party service:',
-        testHelper.operationTestSuite.bind(
-          null,
-          updateContextPayload,
-          caConfig.SERVICE_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS
-        )
-      );
-    });
-
-    describe('Asynchronous button operation requests:', function() {
-      var updateContextPayload = testHelper.getUpdateContextPayload();
-
-      beforeEach(function() {
+      it('should respond with a 200 code and OK reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME + ' attribute and synchronous ' +
+        'button operation', function (done) {
+        var updateContextPayload = testHelper.getUpdateContextPayload({
+          contextElements: {
+            attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME]
+          }
+        });
         caHelper.setAttribute(
           updateContextPayload.contextElements[0].attributes,
           caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
-          caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS);
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
+        );
+
+        request(
+          testHelper.getRequestOptions(
+            {
+              body: updateContextPayload
+            }
+          ),
+          function (err, response, body) {
+            expect(err).to.equal(null);
+            expect(response.statusCode).to.equal(200);
+            expect(body.contextResponses[0].statusCode.code).to.equal('200');
+            expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+            done();
+          }
+        );
       });
 
-      describe('Synchronous third party service:',
-        testHelper.operationTestSuite.bind(
-          null,
-          updateContextPayload,
-          caConfig.SERVICE_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
-        )
-      );
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME + ' attribute and asynchronous ' +
+        'button operation', function (done) {
+        var updateContextPayload = testHelper.getUpdateContextPayload({
+          contextElements: {
+            attributes: [caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME]
+          }
+        });
+        caHelper.setAttribute(
+          updateContextPayload.contextElements[0].attributes,
+          caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS
+        );
 
-      describe('Asynchronous third party service:',
-        testHelper.operationTestSuite.bind(
-          null,
-          updateContextPayload,
-          caConfig.SERVICE_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS
-        )
-      );
-    });
+        request(
+          testHelper.getRequestOptions(
+            {
+              body: updateContextPayload
+            }
+          ),
+          function (err, response, body) {
+            expect(err).to.equal(null);
+            expect(response.statusCode).to.equal(200);
+            expect(body.contextResponses[0].statusCode.code).to.equal('400');
+            expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+            done();
+          }
+        );
+      });
+
+      describe('Synchronous button operation requests:', function () {
+        var updateContextPayload = testHelper.getUpdateContextPayload();
+
+        beforeEach(function () {
+          caHelper.setAttribute(
+            updateContextPayload.contextElements[0].attributes,
+            caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS);
+        });
+
+        describe('Synchronous third party service:',
+          testHelper.operationTestSuite.bind(
+            null,
+            updateContextPayload,
+            caConfig.SERVICE_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
+          )
+        );
+
+        describe('Asynchronous third party service:',
+          testHelper.operationTestSuite.bind(
+            null,
+            updateContextPayload,
+            caConfig.SERVICE_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS
+          )
+        );
+      });
+
+      describe('Asynchronous button operation requests:', function () {
+        var updateContextPayload = testHelper.getUpdateContextPayload();
+
+        beforeEach(function () {
+          caHelper.setAttribute(
+            updateContextPayload.contextElements[0].attributes,
+            caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS);
+        });
+
+        describe('Synchronous third party service:',
+          testHelper.operationTestSuite.bind(
+            null,
+            updateContextPayload,
+            caConfig.SERVICE_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
+          )
+        );
+
+        describe('Asynchronous third party service:',
+          testHelper.operationTestSuite.bind(
+            null,
+            updateContextPayload,
+            caConfig.SERVICE_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS
+          )
+        );
+      });
+    } else {
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s id',
+        function (done) {
+          request(
+            testHelper.getRequestOptions(
+              {
+                body: testHelper.getNotificationPayload({
+                  contextResponses: [
+                    {
+                      contextElement: {
+                        id: false
+                      }
+                    }
+                  ]
+                })
+              }
+            ),
+            function (err, response, body) {
+              expect(err).to.equal(null);
+              expect(response.statusCode).to.equal(200);
+              expect(body.contextResponses[0].statusCode.code).to.equal('400');
+              expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+              done();
+            }
+          );
+        });
+
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s type',
+        function (done) {
+          request(
+            testHelper.getRequestOptions(
+              {
+                body: testHelper.getNotificationPayload({
+                  contextResponses: [
+                    {
+                      contextElement: {
+                        type: false
+                      }
+                    }
+                  ]
+                })
+              }
+            ),
+            function (err, response, body) {
+              expect(err).to.equal(null);
+              expect(response.statusCode).to.equal(200);
+              expect(body.contextResponses[0].statusCode.code).to.equal('400');
+              expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+              done();
+            }
+          );
+        });
+
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s isPattern',
+        function (done) {
+          request(
+            testHelper.getRequestOptions(
+              {
+                body: testHelper.getNotificationPayload({
+                  contextResponses: [
+                    {
+                      contextElement: {
+                        isPattern: false
+                      }
+                    }
+                  ]
+                })
+              }
+            ),
+            function (err, response, body) {
+              expect(err).to.equal(null);
+              expect(response.statusCode).to.equal(200);
+              expect(body.contextResponses[0].statusCode.code).to.equal('400');
+              expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+              done();
+            }
+          );
+        });
+
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME + ' attribute', function (done) {
+        request(
+          testHelper.getRequestOptions(
+            {
+              body: testHelper.getNotificationPayload({
+                contextResponses: [
+                  {
+                    contextElement: {
+                      attributes: [caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME]
+                    }
+                  }
+                ]
+              })
+            }
+          ),
+          function (err, response, body) {
+            expect(err).to.equal(null);
+            expect(response.statusCode).to.equal(200);
+            expect(body.contextResponses[0].statusCode.code).to.equal('400');
+            expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+            done();
+          }
+        );
+      });
+
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.SERVICE_ID_ATTR_NAME + ' attribute', function (done) {
+        request(
+          testHelper.getRequestOptions(
+            {
+              body: testHelper.getNotificationPayload({
+                contextResponses: [
+                  {
+                    contextElement: {
+                      attributes: [caConfig.BUTTON_ENTITY.SERVICE_ID_ATTR_NAME]
+                    }
+                  }
+                ]
+              })
+            }
+          ),
+          function (err, response, body) {
+            expect(err).to.equal(null);
+            expect(response.statusCode).to.equal(200);
+            expect(body.contextResponses[0].statusCode.code).to.equal('400');
+            expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+            done();
+          }
+        );
+      });
+
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.OPERATION_ACTION_ATTR_NAME + ' attribute', function (done) {
+        request(
+          testHelper.getRequestOptions(
+            {
+              body: testHelper.getNotificationPayload({
+                contextResponses: [
+                  {
+                    contextElement: {
+                      attributes: [caConfig.BUTTON_ENTITY.OPERATION_ACTION_ATTR_NAME]
+                    }
+                  }
+                ]
+              })
+            }
+          ),
+          function (err, response, body) {
+            expect(err).to.equal(null);
+            expect(response.statusCode).to.equal(200);
+            expect(body.contextResponses[0].statusCode.code).to.equal('400');
+            expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+            done();
+          }
+        );
+      });
+
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.OPERATION_EXTRA_ATTR_NAME + ' attribute', function (done) {
+        var notificationPayload = testHelper.getNotificationPayload({
+          contextResponses: [
+            {
+              contextElement: {
+                attributes: [caConfig.BUTTON_ENTITY.OPERATION_EXTRA_ATTR_NAME]
+              }
+            }
+          ]
+        });
+        caHelper.setAttribute(
+          notificationPayload.contextResponses[0].contextElement.attributes,
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
+        );
+
+        request(
+          testHelper.getRequestOptions(
+            {
+              body: notificationPayload
+            }
+          ),
+          function (err, response, body) {
+            expect(err).to.equal(null);
+            expect(response.statusCode).to.equal(200);
+            expect(body.contextResponses[0].statusCode.code).to.equal('400');
+            expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+            done();
+          }
+        );
+      });
+
+      it('should respond with a 200 code and OK reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME + ' attribute and synchronous ' +
+        'button operation', function (done) {
+        var notificationPayload = testHelper.getNotificationPayload({
+          contextResponses: [
+            {
+              contextElement: {
+                attributes: [caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME]
+              }
+            }
+          ]
+        });
+        caHelper.setAttribute(
+          notificationPayload.contextResponses[0].contextElement.attributes,
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
+        );
+
+        request(
+          testHelper.getRequestOptions(
+            {
+              body: notificationPayload
+            }
+          ),
+          function (err, response, body) {
+            expect(err).to.equal(null);
+            expect(response.statusCode).to.equal(200);
+            expect(body.contextResponses[0].statusCode.code).to.equal('200');
+            expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+            done();
+          }
+        );
+      });
+
+      it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME + ' attribute and asynchronous ' +
+        'button operation', function (done) {
+        var notificationPayload = testHelper.getNotificationPayload({
+          contextResponses: [
+            {
+              contextElement: {
+                attributes: [caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME]
+              }
+            }
+          ]
+        });
+        caHelper.setAttribute(
+          notificationPayload.contextResponses[0].contextElement.attributes,
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS
+        );
+
+        request(
+          testHelper.getRequestOptions(
+            {
+              body: notificationPayload
+            }
+          ),
+          function (err, response, body) {
+            expect(err).to.equal(null);
+            expect(response.statusCode).to.equal(200);
+            expect(body.contextResponses[0].statusCode.code).to.equal('400');
+            expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_PAYLOAD')).to.equal(0);
+            done();
+          }
+        );
+      });
+
+      describe('Synchronous button operation requests:', function () {
+        var notificationPayload = testHelper.getNotificationPayload();
+
+        beforeEach(function () {
+          caHelper.setAttribute(
+            notificationPayload.contextResponses[0].contextElement.attributes,
+            caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS);
+        });
+
+        describe('Synchronous third party service:',
+          testHelper.operationTestSuite.bind(
+            null,
+            notificationPayload,
+            caConfig.SERVICE_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
+          )
+        );
+
+        describe('Asynchronous third party service:',
+          testHelper.operationTestSuite.bind(
+            null,
+            notificationPayload,
+            caConfig.SERVICE_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS
+          )
+        );
+      });
+
+      describe('Asynchronous button operation requests:', function () {
+        var notificationPayload = testHelper.getNotificationPayload();
+
+        beforeEach(function () {
+          caHelper.setAttribute(
+            notificationPayload.contextResponses[0].contextElement.attributes,
+            caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+            caConfig.BUTTON_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS);
+        });
+
+        describe('Synchronous third party service:',
+          testHelper.operationTestSuite.bind(
+            null,
+            notificationPayload,
+            caConfig.SERVICE_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
+          )
+        );
+
+        describe('Asynchronous third party service:',
+          testHelper.operationTestSuite.bind(
+            null,
+            notificationPayload,
+            caConfig.SERVICE_ENTITY.INTERACTION_TYPES.ASYNCHRONOUS
+          )
+        );
+      });
+    }
   });
 });

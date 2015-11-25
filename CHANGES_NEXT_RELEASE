@@ -1,4 +1,1 @@
-- [BUG] Passing the Third Party a publicly accesible callback URL
-- [BUG] Responding to redirected queryContext requests due to polling
-- [BUG] Responding to redirected updateContext requests due to polling (aux_last_operation attribute)
-- [BUG] Encoding the characters not allowed by the Context Broker
+- [FEATURE] Support for a new mode of operation based on Context Broker notifications

@@ -1,5 +1,7 @@
 #<a id="section0"></a> Context Adapter
 
+[![Join the chat at https://gitter.im/telefonicaid/context-adapter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/telefonicaid/context-adapter?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 * [Introduction] (#section1)
 * [Dependencies](#section2)
 * [Installation](#section3)
@@ -190,6 +192,11 @@ The script accepts the following parameters as environment variables:
 - CA_PUBLIC_HOST: The public host or IP where the Context Adapter server will be listening. Default value: "127.0.0.1".
 - CA_PORT: The port where the Context Adapter server will be listening. Optional. Default value: "9999".
 - CA_PATH: The path to add to the routes where the Context Broker is attending requests. Optional. Default value: "/v1".
+- CA_MODE: The Context Adapter supports 2 modes of operation: 1) it can act as a context provider receiving the redirected
+updateContext requests received by the Context Broker as a consequence of button clicks (to set this
+operation mode set the `mode` configuration option to "context-provider") and 2) being notified by the
+Context Broker of new button clicks (to set this operation mode set the `mode` configuration option to
+"notification"). Default value: "notification".
 - LOGOPS_LEVEL: The logging level of the messages. Messages with a level equal or superior to this will be logged.
 Accepted values are: "debug", "info", "warn" and "error". Optional. Default value: "info".
 - PROOF_OF_LIFE_INTERVAL: The time in seconds between proof of life logging messages informing that the server is up and running normally. Default value: "60".

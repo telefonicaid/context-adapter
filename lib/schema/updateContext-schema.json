@@ -1,0 +1,55 @@
+{
+  "properties": {
+    "payload": {
+      "id": "payload",
+      "type": "object",
+      "required": true,
+      "properties": {
+        "contextElements": {
+          "id": "contextElements",
+          "type": "array",
+          "required": true,
+          "minItems": 0,
+          "maxItems": 2,
+          "items": {
+            "id": "0",
+            "type": "object",
+            "required": true,
+            "properties": {
+              "id": {
+                "id": "id",
+                "type": "string",
+                "required": true
+              },
+              "type": {
+                "id": "type",
+                "type": "string",
+                "required": true
+              },
+              "isPattern": {
+                "id": "isPattern",
+                "type": "string",
+                "required": true,
+                "pattern": "false"
+              },
+              "attributes": {
+                "id": "attributes",
+                "type": "array",
+                "required": true,
+                "minItems": 4,
+                "maxItems": 6,
+                "message": "lacks some mandatory attributes or invalid values are included"
+              }
+            }
+          }
+        },
+        "updateAction": {
+          "id": "updateAction",
+          "type": "string",
+          "required": true,
+          "pattern": "UPDATE"
+        }
+      }
+    }
+  }
+}

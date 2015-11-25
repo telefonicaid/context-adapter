@@ -35,7 +35,7 @@
     host: 'localhost',
     // The public host or IP where the Context Adapter server will be listening. Default value: "127.0.0.1".
     publicHost: '127.0.0.1',
-    // The port where the Context Adapter server will be listening. Default value: "8666".
+    // The port where the Context Adapter server will be listening. Default value: "9999".
     port: '9999',
     // The path where the Context Adapter server will be expecting requests. Default value: "/v1".
     path: '/v1',
@@ -44,7 +44,12 @@
     defaultService: 'blackbutton',
     // The service path to be used if not sent by the Context Broker in the interchanged messages.
     //  Default value: "/".
-    defaultServicePath: '/'
+    defaultServicePath: '/',
+    // The Context Adapter supports 2 modes of operation: 1) It can act as a context provider receiving the redirected
+    //  updateContext requests received by the Context Broker as a consequence of new clicks of buttons (to set this
+    //  operation mode set the 'mode' configuration option to 'context-provider' and 2) Being notified by the
+    //  Context Broker of new button clicks. Default value: 'notification'.
+    mode: 'notification'
   };
 
 // Logging configuration
