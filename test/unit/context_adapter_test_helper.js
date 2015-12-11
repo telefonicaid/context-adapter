@@ -79,7 +79,7 @@ function getUpdateContextPayload(options) {
           {
             name: caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME,
             type: 'string',
-            value: '<aux-op-status>'
+            value: caConfig.BUTTON_ENTITY.OPERATION_STATUS.PENDING
           }
         ]
       }
@@ -99,9 +99,17 @@ function getUpdateContextPayload(options) {
       }
       if (options.contextElements.attributes && Array.isArray(options.contextElements.attributes)) {
         for (var i = 0; i < options.contextElements.attributes.length; i++) {
-          caHelper.removeAttribute(
-            payload.contextElements[0].attributes,
-            options.contextElements.attributes[i]);
+          if (options.contextElements.attributes[i].value) {
+            caHelper.setAttribute(
+              options.contextElements.attributes,
+              options.contextElements.attributes[i].name,
+              options.contextElements.attributes[i].value
+            );
+          } else {
+            caHelper.removeAttribute(
+              payload.contextElements[0].attributes,
+              options.contextElements.attributes[i].name);
+          }
         }
       }
     }
@@ -164,7 +172,7 @@ function getNotificationPayload(options) {
             {
               name: caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME,
               type: 'string',
-              value: '<aux-op-status>'
+              value: caConfig.BUTTON_ENTITY.OPERATION_STATUS.PENDING
             }
           ]
         },
@@ -189,9 +197,17 @@ function getNotificationPayload(options) {
       if (options.contextResponses[0].contextElement.attributes &&
         Array.isArray(options.contextResponses[0].contextElement.attributes)) {
         for (var i = 0; i < options.contextResponses[0].contextElement.attributes.length; i++) {
-          caHelper.removeAttribute(
-            payload.contextResponses[0].contextElement.attributes,
-            options.contextResponses[0].contextElement.attributes[i]);
+          if (options.contextResponses[0].contextElement.attributes[i].value) {
+            caHelper.setAttribute(
+              payload.contextResponses[0].contextElement.attributes[i],
+              options.contextResponses[0].contextElement.attributes[i].name,
+              options.contextResponses[0].contextElement.attributes[i].value
+            );
+          } else {
+            caHelper.removeAttribute(
+              payload.contextResponses[0].contextElement.attributes,
+              options.contextResponses[0].contextElement.attributes[i].name);
+          }
         }
       }
     }
