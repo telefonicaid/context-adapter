@@ -1,1 +1,1 @@
-- [FEATURE] Support for a new mode of operation based on Context Broker notifications
+- [FEATURE] Ignoring requests including an op_status not equal to 'P' (pending)
