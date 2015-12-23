@@ -1,1 +1,1 @@
-- [FEATURE] Updating the geolocation of entities based on cell id information
+- [BUG] location attributes must be appended and not updated in the Context Broker
