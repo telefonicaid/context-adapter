@@ -1,1 +1,1 @@
-- [FEATURE] Ignoring requests including an op_status not equal to 'P' (pending)
+- [FEATURE] Updating the geolocation of entities based on cell id information
