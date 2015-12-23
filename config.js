@@ -49,7 +49,9 @@
     //  updateContext requests received by the Context Broker as a consequence of new clicks of buttons (to set this
     //  operation mode set the 'mode' configuration option to 'context-provider' and 2) Being notified by the
     //  Context Broker of new button clicks. Default value: 'notification'.
-    mode: 'notification'
+    mode: 'notification',
+    // API key to be used to retrieve geolocation information from Google's Maps Geolocation API
+    googleMapsGeolocationAPIKey: ''
   };
 
 // Logging configuration
