@@ -3,6 +3,11 @@
 [![Join the chat at https://gitter.im/telefonicaid/context-adapter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/telefonicaid/context-adapter?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 * [Introduction] (#section1)
+    * [Black Button flow] (#section11)
+        * [Context Adapter as context provider scenario] (#section111)
+        * [Context Adapter notification scenario] (#section112)
+        * [Third Party service protocol] (#section113)
+    * [Geolocation update] (#section12)
 * [Dependencies](#section2)
 * [Installation](#section3)
 * [Running the Context Adapter](#section4)
@@ -13,129 +18,433 @@
 
 ##<a id="section1"></a> Introduction
 
-The Context Adapter is a FIWARE component part of the Black Button platform by Telefónica.
+The Context Adapter is a FIWARE component part of the [FIWARE platform](https://www.fiware.org).
 
-The Context Adapter is in charge of adapting the communication (protocols and messages) between
+For the time being, the Context Adapter is able to function in 2 compatible modes. This is, the component is able to
+handle requests for each one of these modes simultaneously.
+
+The supported modes are:
+
+    1 Black Button flow
+
+    2 Geolocation resolution and update
+
+###<a id="section11"></a> Black Button flow
+
+Working in this mode, the Context Adapter is in charge of adapting the communication (protocols and messages) between
 Telefónica's IoT Platform (and, more concretely, the [Orion Context Broker](https://github.com/telefonicaid/fiware-orion))
 and the services exposed by Third Parties.
 
-More concretely, the Context Adapter attends 2 types of requests:
+To this regard, the Context Adapter is able to handle redirected `updateContext` requests (see the `Context Adapter as a
+context provider scenario` section below) or notification (`notify`) requests (see the `Context Adapter notifications
+scenario`) sent by the Context Broker.
 
-1 `updateContext` requests redirected by the Orion Context Broker. These requests should have a payload such as the
-following one:
+The main capability of the Context Adapter consists of transforming these requests into requests to the corresponding
+Third Party service associated to the clicked Black Button.
+
+Once the response is received from the Third Party (synchronously or asynchronously), the Context Adapter
+updates the concrete Black Button entity updating not only the response or result received from the Third Party service
+but also the status of the Black Button request.
+
+####<a id="section111"></a> Context Adapter as context provider scenario
+
+In this scenario, the Context Broker is properly configured to redirect `updateContext` requests to the Context Adapter
+as the result of a Black Button click.
+
+To configure the Context Adapter to work as a context provider, the `CA_MODE` configuration variable must be set to
+`context-provider` as mentioned in the [Running the Context Adapter](#section4) section below.
+
+In this scenario, the Context Broker redirects to the Context Adapter an `updateContext` request such as the following one:
 
 <pre>
     {
-      contextElements: [
-        {
-          id: <device-id>,
-          type: caConfig.BUTTON_ENTITY.TYPE,
-          isPattern: false,
-          attributes: [
+        "contextElements": [
             {
-              name: caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME,
-              type: 'string',
-              value: '<aux-service-id>'
-            },
-            {
-              name: caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
-              type: 'string',
-              value: 'synchronous | asynchronous'
-            },
-            {
-              name: caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME,
-              type: 'string',
-              value: '<aux-op-extra>'
-            },
-            {
-              name: caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME,
-              type: 'string',
-              value: '<aux-op-status>'
+                "id": &lt;device-id&gt;,
+                "type": "BlackButton",
+                "isPattern": false,
+                "attributes": [
+                    {
+                        "name": "aux_interaction_type",
+                        "type": "string",
+                        "value": &lt;synchronous | asynchronous&gt;
+                    },
+                    {
+                        "name": "aux_service_id",
+                        "type": "string",
+                        "value": &lt;aux-service-id&gt;
+                    },
+                    {
+                        "name": "aux_op_action",
+                        "type": "string",
+                        "value": &lt;aux-op-action&gt;
+                    },
+                    {
+                        "name": "aux_op_extra",
+                        "type": "string",
+                        "value": &lt;aux-op-extra&gt;
+                    },
+                    {
+                        "name": "aux_op_status",
+                        "type": "string",
+                        "value": &lt;aux-op-status&gt;
+                    }
+                ]
             }
-          ]
-        }
-      ],
-      updateAction: 'UPDATE'
+        ],
+        "updateAction": "UPDATE"
     }
 </pre>
 
-2 `update` requests by third party's services when updating information about an asynchronous request. These requests
-should have a payload such as the following one:
+From the information contained in this request (and more concretely the `aux_service_id` property), the Context Adapter obtains
+detailed information about the Third Party service to be invoked sending a `queryContext` request to the
+Context Broker with the following payload:
 
 <pre>
     {
-      buttonId: <button-id>,
-      serviceId: <service-id>,
-      action: <action>,
-      extra: <extra>,
-      result: <result>
-    }
-</pre>
-
-On the other hand, the Context Adapter queries (`queryContext`) the Orion Context Broker for service information using
-a payload such as the following one:
-
-<pre>
-    {
-      entities: [
+      "entities": [
         {
-          id: <service-id>,
-          type: 'service',
-          isPattern: false,
-          attributes: [
-            'endpoint',
-            'method',
-            'authentication',
-            'mapping',
-            'timeout'
+          "id": &lt;service-id&gt;,
+          "type": "service",
+          "isPattern": false,
+          "attributes": [
+            "endpoint",
+            "method",
+            "authentication",
+            "mapping",
+            "timeout"
           ]
         }
       ]
     }
 </pre>
 
-To which, the Orion Context Broker responds providing the concrete service information, if any:
+The Context Broker responds to the previous `queryContext` request with information about the concrete Third Party service such as the following one:
 
 <pre>
     {
-      contextElements: [
+      "contextElements": [
         {
-          id: <service-id>,
-          type: 'service',
-          isPattern: false,
-          attributes: [
+          "id": &lt;service-id&gt;,
+          "type": "service",
+          "isPattern": false,
+          "attributes": [
             {
-              name: 'endpoint',
-              type: 'string',
-              value: '<endpoint>'
+              "name": "endpoint",
+              "type": "string",
+              "value": &lt;endpoint&gt;
             },
             {
-              name: 'method',
-              type: 'string',
-              value: '<method>'
+              "name": "method",
+              "type": "string",
+              "value": &lt;method&gt;
             },
             {
-              name: 'authentication',
-              type: 'string',
-              value: <authentication>
+              "name": "authentication",
+              "type": "string",
+              "value": &lt;authentication&gt;
             },
             {
-              name: 'mapping',
-              type: 'string',
-              value: '<mapping>'
+              "name": "mapping",
+              "type": "string",
+              "value": &lt;mapping&gt;
             },
             {
-              name: 'timeout',
-              type: 'string',
-              value: '<timeout>'
+              "name": "timeout",
+              "type": "string",
+              "value": &lt;timeout&gt;
             }
           ]
         }
       ],
-      statusCode: {
-        code: '200',
-        reasonPhrase: 'OK'
+      "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
       }
+    }
+</pre>
+
+Using this information, the Context Adapter sends a request to the provided `endpoint` using the provided `method`
+following the protocol specified in the [Third Party service protocol](#section113) section below.
+
+The response or result received from the Third Party service is finally updated in the Context Broker
+(via an `updateContext` request) as the result of the initial Black Button request as well as its final status
+(i.e., successfully completed or completed with error).
+
+####<a id="section112"></a> Context Adapter notification scenario
+
+In this scenario, the Context Broker is properly configured to send notification requests to the Context Adapter as
+the result of a Black Button click.
+
+To configure the Context Adapter to work as a context provider, the `CA_MODE` configuration variable must be set to
+`notification` as mentioned in the [Running the Context Adapter](#section4) section below.
+
+In this scenario, the Context Broker sends notification requests to the Context Adapter such as the following one:
+
+<pre>
+    {
+        "subscriptionId": &lt;subscription-id&gt;,
+        "originator": &lt;orion-contextBroker-instance&gt;,
+        "contextResponses": [
+            {
+                "contextElement": {
+                    "id": &lt;device-id&gt;,
+                    "type": "BlackButton",
+                    "isPattern": false,
+                    "attributes": [
+                        {
+                            "name": "interaction_type",
+                            "type": "string",
+                            "value": &lt;synchronous | asynchronous&gt;
+                        },
+                        {
+                            "name": "service_id",
+                            "type": "string",
+                            "value": &lt;service-id&gt;
+                        },
+                        {
+                            "name": "op_action",
+                            "type": "string",
+                            "value": &lt;op-action&gt;
+                        },
+                        {
+                            "name": "op_extra",
+                            "type": "string",
+                            "value": &lt;op-extra&gt;
+                        }
+                    ]
+                },
+                "statusCode": {
+                    "code": "200",
+                    "reasonPhrase": "OK"
+                }
+            }
+        ]
+    }
+</pre>
+
+From the information contained in this request (and more concretely the `service_id` property), the Context Adapter obtains
+detailed information about the Third Party service to be invoked sending a `queryContext` request to the
+Context Broker with the following payload:
+
+<pre>
+    {
+        "entities": [
+            {
+                "id": &lt;service-id&gt;,
+                "type": "service",
+                "isPattern": false,
+                "attributes": [
+                    "endpoint",
+                    "method",
+                    "authentication",
+                    "mapping",
+                    "timeout"
+                ]
+            }
+        ]
+    }
+</pre>
+
+The Context Broker responds to the previous `queryContext` request with information about the Third Party service
+such as the following one:
+
+<pre>
+    {
+        "contextElements": [
+            {
+                "id": &lt;service-id&gt;,
+                "type": "service",
+                "isPattern": false,
+                "attributes": [
+                    {
+                        "name": "endpoint",
+                        "type": "string",
+                        "value": &lt;endpoint&gt;
+                    },
+                    {
+                        "name": "method",
+                        "type": "string",
+                        "value": &lt;method&gt;
+                    },
+                    {
+                        "name": "authentication",
+                        "type": "string",
+                        "value": &lt;authentication&gt;
+                    },
+                    {
+                        "name": "mapping",
+                        "type": "string",
+                        "value": &lt;mapping&gt;
+                    },
+                    {
+                        "name": "timeout",
+                        "type": "string",
+                        "value": &lt;timeout&gt;
+                    }
+                ]
+            }
+        ],
+        "statusCode": {
+            "code": "200",
+            "reasonPhrase": "OK"
+        }
+    }
+</pre>
+
+Using this information, the Context Adapter sends a request to the provided `endpoint` using the provided `method`
+following the protocol specified in the [Third Party service protocol](#section113) section below.
+
+The response or result received from the Third Party service is finally updated in the Context Broker
+(via an `updateContext` request) as the result of the initial Black Button request as well as its final status
+(i.e., successfully completed or completed with error).
+
+####<a id="section113"></a> Third Party service protocol
+
+Once the information about the Third Party service has been collected, the Context Adapter interacts with it following
+to the next protocol:
+
+1 Synchronous Third Party services (for services with `interaction-type` to `synchronous`):
+
+    1 The Context Adapter sends a request to the proper `endpoint` using the proper `method` with the following payload:
+      {
+        "button”: ”<button-id>",
+        "action”: ”<action>”,
+        "extra”: ”<extra>”
+      }
+    2 The Third Party service synchronously responds with a 200 - OK (the Context Adapter is able to deal with error
+     codes such as not responding Third Party services, 4XX, 5XX, etc.) with the following payload:
+      {
+        "details”: {
+            "rt":"20”,
+            "rrgb":”00FF00"
+        }
+      }
+      `details` may contain any JSON object which the Context Adapter will stringify and update in the Context Broker as
+      the result of the original request.
+
+2 Asynchronous Third Party services (for services with `interaction-type` to `asynchronous`):
+
+    1 The Context Adapter sends a request to the proper `endpoint` using the proper `method` with the following payload:
+          {
+            "button”: ”<button-id>",
+            "action”: ”<action>”,
+            "extra”: ”<extra>”,
+            "callback”: "http://context-adapter-host:port/v1/update” (the /v1 path and the /update part are both configurable)
+          }
+    2 The Third Party service synchronously responds to the previous request with a 200 - OK (the Context Adapter is
+    able to deal with error codes such as not responding Third Party services, 4XX, 5XX, etc.).
+    3 The Third Party service sends a `POST` request to the URL specified in the `callback` property sent in the
+    original request with the following payload:
+        {
+            "buttonId”: ”<button-id>”,
+            "externalId”: ”<external-id>”,
+            "details”: {
+                "rt":"20”,
+                "rrgb":”00FF00"
+        }
+    `details` may contain any JSON object which the Context Adapter will stringify and update in the Context Broker as
+    the result of the original request.
+    4 The Context Adapter responds to the previous request from the Third Party service with a 200 - OK status code.
+
+###<a id="section12"></a> Geolocation update
+
+Working in this mode, the Context Adapter is able to update the geolocation of entities, transforming cell tower information
+such as the cell identifier, the mobile country code, the mobile network code and the location area code into coordinates
+(latitude and longitude).
+
+In this case, the Context Adapter receives a notification of an entity update including a `P1` compound attribute
+including all the cell tower information such as the following one:
+
+<pre>
+    {
+        "subscriptionId": &lt;subscription-id&gt;,
+        "originator": &lt;orion.contextBroker.instance&gt;,
+        "contextResponses": [
+            {
+                "contextElement": {
+                    "attributes": [
+                        {
+                            "name": "P1",
+                            "type": "compound",
+                            "value": [
+                                {
+                                    "name": "mcc",
+                                    "type": "string",
+                                    "value": &lt;mobile-country-code&gt;
+                                },
+                                {
+                                  "name": "mnc",
+                                  "type": "string",
+                                  "value": &lt;mobile-network-code&gt;
+                                },
+                                {
+                                  "name": "lac",
+                                  "type": "string",
+                                  "value": &lt;location-area-code-as-hexadecimal-number&gt;
+                                },
+                                {
+                                  "name": "cell-id",
+                                  "type": "string",
+                                  "value": &lt;cell-id-as-hexadecimal-number&gt;
+                                }
+                            ]
+                        }
+                    ],
+                    "type": &lt;type&gt;,
+                    "isPattern": false,
+                    "id": &lt;device-id&gt;
+                },
+                "statusCode": {
+                    "code": "200",
+                    "reasonPhrase": "OK"
+                }
+            }
+        ]
+    }
+</pre>
+
+Using the provided information, the Context Adapter invokes the
+[Google Maps Geolocation API](https://developers.google.com/maps/documentation/geolocation/intro) to get the concrete
+geolocation coordinates (latitude and longitude).
+
+Once these coordinates have been received, the Context Adapter updates the geolocation of the concrete entity sending
+`updateContext` request to the configured Context Broker with a payload similar to the following one:
+
+<pre>
+    {
+        "contextElements": [
+            {
+                "id": &lt;device-id&gt;,
+                "type": &lt;type&gt;,
+                "isPattern": false,
+                "attributes": [
+                    {
+                        "name": "position",
+                        "type": "coords",
+                        "value": &lt;latitute, longitude&gt;,
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            },
+                            {
+                                "name": "TimeInstant",
+                                "type": "ISO8601",
+                                "value": &lt;date-in-iso-8601-format&gt;
+                            },
+                            {
+                                "name": "accuracy",
+                                "type": "meters",
+                                "value": &lt;accuracy&gt;
+                            }
+                        ]
+                    }
+                ],
+                "updateAction": "APPEND"
+            }
+        ]
     }
 </pre>
 
