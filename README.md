@@ -19,56 +19,201 @@ The Context Adapter is in charge of adapting the communication (protocols and me
 Telefónica's IoT Platform (and, more concretely, the [Orion Context Broker](https://github.com/telefonicaid/fiware-orion))
 and the services exposed by Third Parties.
 
-More concretely, the Context Adapter attends 2 types of requests:
+More concretely, the Context Adapter attends 4 types of requests:
 
-1 `updateContext` requests redirected by the Orion Context Broker. These requests should have a payload such as the
+1 In case the CA_MODE configuration option (see below) is set as `context-provider`, the Context Adapter attends
+`updateContext` requests redirected by the Orion Context Broker. These requests should have a payload such as the
 following one:
 
 <pre>
     {
-      contextElements: [
-        {
-          id: <device-id>,
-          type: caConfig.BUTTON_ENTITY.TYPE,
-          isPattern: false,
-          attributes: [
+        "contextElements": [
             {
-              name: caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME,
-              type: 'string',
-              value: '<aux-service-id>'
-            },
-            {
-              name: caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
-              type: 'string',
-              value: 'synchronous | asynchronous'
-            },
-            {
-              name: caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME,
-              type: 'string',
-              value: '<aux-op-extra>'
-            },
-            {
-              name: caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME,
-              type: 'string',
-              value: '<aux-op-status>'
+                "id": &lt;device-id&gt;,
+                "type": "BlackButton",
+                "isPattern": false,
+                "attributes": [
+                    {
+                        "name": "aux_interaction_type",
+                        "type": "string",
+                        "value": &lt;synchronous | asynchronous&gt;
+                    },
+                    {
+                        "name": "aux_service_id",
+                        "type": "string",
+                        "value": &lt;aux-service-id&gt;
+                    },
+                    {
+                        "name": "aux_op_action",
+                        "type": "string",
+                        "value": &lt;aux-op-action&gt;
+                    },
+                    {
+                        "name": "aux_op_extra",
+                        "type": "string",
+                        "value": &lt;aux-op-extra&gt;
+                    },
+                    {
+                        "name": "aux_op_status",
+                        "type": "string",
+                        "value": &lt;aux-op-status&gt;
+                    }
+                ]
             }
-          ]
-        }
-      ],
-      updateAction: 'UPDATE'
+        ],
+        "updateAction": "UPDATE"
     }
 </pre>
 
-2 `update` requests by third party's services when updating information about an asynchronous request. These requests
-should have a payload such as the following one:
+2 In case the CA_MODE configuration option (see below) is set as `notification`, the Context Adapter attends
+`notification` requests sent by the Orion Context Broker. These requests should have a payload such as the
+following one:
 
 <pre>
     {
-      buttonId: <button-id>,
-      serviceId: <service-id>,
-      action: <action>,
-      extra: <extra>,
-      result: <result>
+      "subscriptionId": &lt;subscription-id&gt;,
+        "originator": &lt;orion-contextBroker-instance&gt;,
+        "contextResponses": [
+            {
+                "contextElement": {
+                    "id": &lt;device-id&gt;,
+                    "type": "BlackButton",
+                    "isPattern": false,
+                    "attributes": [
+                        {
+                            "name": "interaction_type",
+                            "type": "string",
+                            "value": &lt;synchronous | asynchronous&gt;
+                        },
+                        {
+                            "name": "service_id",
+                            "type": "string",
+                            "value": &lt;service-id&gt;
+                        },
+                        {
+                            "name": "op_action",
+                            "type": "string",
+                            "value": &lt;op-action&gt;
+                        },
+                        {
+                            "name": "op_extra",
+                            "type": "string",
+                            "value": &lt;op-extra&gt;
+                        }
+                    ]
+                },
+                "statusCode": {
+                    "code": "200",
+                    "reasonPhrase": "OK"
+                }
+            }
+        ]
+    }
+</pre>
+
+3 `update` requests by third party's services when updating information about an asynchronous request. These requests
+should be sent to the URL provided by the Context Adapter to the Third Party in the `callback` property of the request
+and should have a payload such as the following one:
+
+<pre>
+    {
+      "buttonId": &lt;button-id&gt;,
+      "serviceId": &lt;service-id&gt;,
+      "action": &lt;action&gt;,
+      "extra": &lt;extra&gt;,
+      "result": &lt;result&gt;
+    }
+</pre>
+
+4 `geolocation update notification` requests. In this case, the notification request should include an entity with a
+`compound` attribute named `P1` such as the following one:
+
+<pre>
+    {
+        "subscriptionId": &lt;subscription-id&gt;,
+        "originator": &lt;orion.contextBroker.instance&gt;,
+        "contextResponses": [
+            {
+                "contextElement": {
+                    "attributes": [
+                        {
+                            "name": "P1",
+                            "type": "compound",
+                            "value": [
+                                {
+                                    "name": "mcc",
+                                    "type": "string",
+                                    "value": &lt;mobile-country-code&gt;
+                                },
+                                {
+                                  "name": "mnc",
+                                  "type": "string",
+                                  "value": &lt;mobile-network-code&gt;
+                                },
+                                {
+                                  "name": "lac",
+                                  "type": "string",
+                                  "value": &lt;location-area-code-as-hexadecimal-number&gt;
+                                },
+                                {
+                                  "name": "cell-id",
+                                  "type": "string",
+                                  "value": &lt;cell-id-as-hexadecimal-number&gt;
+                                }
+                            ]
+                        }
+                    ],
+                    "type": &lt;type&gt;,
+                    "isPattern": false,
+                    "id": &lt;device-id&gt;
+                },
+                "statusCode": {
+                    "code": "200",
+                    "reasonPhrase": "OK"
+                }
+            }
+        ]
+    }
+</pre>
+
+The Context Adapter processes notification requests such as the previous one and using the
+[Google Maps Geolocation API](https://developers.google.com/maps/documentation/geolocation/intro) and sends an
+`updateContext` request to the configured Context Broker such as the following one:
+
+<pre>
+    {
+        "contextElements": [
+            {
+                "id": &lt;device-id&gt;,
+                "type": &lt;type&gt;,
+                "isPattern": false,
+                "attributes": [
+                    {
+                        "name": "position",
+                        "type": "coords",
+                        "value": &lt;latitute, longitude&gt;,
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            },
+                            {
+                                "name": "TimeInstant",
+                                "type": "ISO8601",
+                                "value": &lt;date-in-iso-8601-format&gt;
+                            },
+                            {
+                                "name": "accuracy",
+                                "type": "meters",
+                                "value": &lt;accuracy&gt;
+                            }
+                        ]
+                    }
+                ],
+                "updateAction": "APPEND"
+            }
+        ]
     }
 </pre>
 
@@ -77,17 +222,17 @@ a payload such as the following one:
 
 <pre>
     {
-      entities: [
+      "entities": [
         {
-          id: <service-id>,
-          type: 'service',
-          isPattern: false,
-          attributes: [
-            'endpoint',
-            'method',
-            'authentication',
-            'mapping',
-            'timeout'
+          "id": &lt;service-id&gt;,
+          "type": "service",
+          "isPattern": false,
+          "attributes": [
+            "endpoint",
+            "method",
+            "authentication",
+            "mapping",
+            "timeout"
           ]
         }
       ]
@@ -98,43 +243,43 @@ To which, the Orion Context Broker responds providing the concrete service infor
 
 <pre>
     {
-      contextElements: [
+      "contextElements": [
         {
-          id: <service-id>,
-          type: 'service',
-          isPattern: false,
-          attributes: [
+          "id": &lt;service-id&gt;,
+          "type": "service",
+          "isPattern": false,
+          "attributes": [
             {
-              name: 'endpoint',
-              type: 'string',
-              value: '<endpoint>'
+              "name": "endpoint",
+              "type": "string",
+              "value": &lt;endpoint&gt;
             },
             {
-              name: 'method',
-              type: 'string',
-              value: '<method>'
+              "name": "method",
+              "type": "string",
+              "value": &lt;method&gt;
             },
             {
-              name: 'authentication',
-              type: 'string',
-              value: <authentication>
+              "name": "authentication",
+              "type": "string",
+              "value": &lt;authentication&gt;
             },
             {
-              name: 'mapping',
-              type: 'string',
-              value: '<mapping>'
+              "name": "mapping",
+              "type": "string",
+              "value": &lt;mapping&gt;
             },
             {
-              name: 'timeout',
-              type: 'string',
-              value: '<timeout>'
+              "name": "timeout",
+              "type": "string",
+              "value": &lt;timeout&gt;
             }
           ]
         }
       ],
-      statusCode: {
-        code: '200',
-        reasonPhrase: 'OK'
+      "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
       }
     }
 </pre>
