@@ -54,7 +54,8 @@ as the result of a Black Button click.
 To configure the Context Adapter to work as a context provider, the `CA_MODE` configuration variable must be set to
 `context-provider` as mentioned in the [Running the Context Adapter](#section4) section below.
 
-In this scenario, the Context Broker redirects to the Context Adapter an `updateContext` request such as the following one:
+In this scenario, the Context Broker redirects to the Context Adapter (more concretely to the path `/v1/updateContext`,
+where the `/v1` part is configurable)  an `updateContext` request such as the following one:
 
 <pre>
     {
@@ -173,8 +174,8 @@ The response or result received from the Third Party service is finally updated 
 
 ####<a id="section112"></a> Context Adapter notification scenario
 
-In this scenario, the Context Broker is properly configured to send notification requests to the Context Adapter as
-the result of a Black Button click.
+In this scenario, the Context Broker is properly configured to send notification requests to the Context Adapter
+(more concretely to the path `/v1/notify`, where the `/v1` part is configurable) as the result of a Black Button click.
 
 To configure the Context Adapter to work as a context provider, the `CA_MODE` configuration variable must be set to
 `notification` as mentioned in the [Running the Context Adapter](#section4) section below.
@@ -353,8 +354,9 @@ Working in this mode, the Context Adapter is able to update the geolocation of e
 such as the cell identifier, the mobile country code, the mobile network code and the location area code into coordinates
 (latitude and longitude).
 
-In this case, the Context Adapter receives a notification of an entity update including a `P1` compound attribute
-including all the cell tower information such as the following one:
+In this case, the Context Adapter receives a notification in the path `/v1/notifyGeolocation` (where the `/v1` part is
+configurable) of an entity update including a `P1` compound attribute. This `P1` attribute includes all the cell tower
+information. The notification request received should be such as the following one:
 
 <pre>
     {
