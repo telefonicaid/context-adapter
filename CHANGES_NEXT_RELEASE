@@ -1,1 +1,7 @@
-- [BUG] location attributes must be appended and not updated in the Context Broker
+- [TASK] Documentation about the new geolocation update feature
+- [TASK] Documentation about the CA functioning
+- [TASK] Unit tests for the new geolocation update feature included
+- [FEATURE] Use the TimeInstant metadata of the P1 attribute when updating a device geolocation if it exists or the
+ notification reception time otherwise
+- [FEATURE] Specific endpoint for geolocation updates
+- [FEATURE] Expect all cell data as hexadecimal numbers

@@ -25,8 +25,30 @@
 
 var caConfig = require('../../lib/context_adapter_configuration');
 var caHelper = require('../../lib/context_adapter_helper');
+var caTestConfig = require('../../test/unit/context_adapter_test_configuration');
 var nock = require('nock');
 var request = require('request');
+
+/**
+ * Apply the attribute options passed to a request generation process
+ * @param contextElement The contextElement object being generated
+ * @param attributes The attribute options
+ */
+function applyAttributeOptions(contextElement, attributes) {
+  for (var i = 0; i < attributes.length; i++) {
+    if (attributes[i].value) {
+      caHelper.setAttribute(
+        contextElement.attributes[i],
+        attributes[i].name,
+        attributes[i].value
+      );
+    } else {
+      caHelper.removeAttribute(
+        contextElement.attributes,
+        attributes[i].name);
+    }
+  }
+}
 
 /**
  * Returns a valid and well-formed or invalid and not well-formed
@@ -98,19 +120,9 @@ function getUpdateContextPayload(options) {
         delete payload.contextElements[0].isPattern;
       }
       if (options.contextElements.attributes && Array.isArray(options.contextElements.attributes)) {
-        for (var i = 0; i < options.contextElements.attributes.length; i++) {
-          if (options.contextElements.attributes[i].value) {
-            caHelper.setAttribute(
-              options.contextElements.attributes,
-              options.contextElements.attributes[i].name,
-              options.contextElements.attributes[i].value
-            );
-          } else {
-            caHelper.removeAttribute(
-              payload.contextElements[0].attributes,
-              options.contextElements.attributes[i].name);
-          }
-        }
+        applyAttributeOptions(
+          payload.contextElements[0],
+          options.contextElements.attributes);
       }
     }
     if (options.updateAction === false) {
@@ -196,19 +208,9 @@ function getNotificationPayload(options) {
       }
       if (options.contextResponses[0].contextElement.attributes &&
         Array.isArray(options.contextResponses[0].contextElement.attributes)) {
-        for (var i = 0; i < options.contextResponses[0].contextElement.attributes.length; i++) {
-          if (options.contextResponses[0].contextElement.attributes[i].value) {
-            caHelper.setAttribute(
-              payload.contextResponses[0].contextElement.attributes[i],
-              options.contextResponses[0].contextElement.attributes[i].name,
-              options.contextResponses[0].contextElement.attributes[i].value
-            );
-          } else {
-            caHelper.removeAttribute(
-              payload.contextResponses[0].contextElement.attributes,
-              options.contextResponses[0].contextElement.attributes[i].name);
-          }
-        }
+        applyAttributeOptions(
+          payload.contextResponses[0].contextElement,
+          options.contextResponses[0].contextElement.attributes);
       }
     }
     if (options.contextResponses[0].statusCode) {
@@ -452,7 +454,7 @@ function getServiceDescriptorResponse(options) {
  *  and will not include the 'Fiware-Service ' header
  *  @return {object} The request module options
  */
-function getRequestOptions(options) {
+function getBlackButtonRequestOptions(options) {
   options = options || {};
   var requestOptions = {
     uri: options.uri || 'http://' + caConfig.CA_HOST + ':' + caConfig.CA_PORT +
@@ -489,11 +491,11 @@ function getRequestOptions(options) {
  *        result: {
  *          code: '200'
  *        }
- *      }
- *    }
+ *      },
+ *      updateGeolocationNotification: true
  *  will make the nocked Context Broker to allow unmocked operations, to reply with an error, an NGSI error or
  *  a valid service description (depending on the selected option) and will expect status notification for the
- *  provided status and result prefix
+ *  provided status and result prefix or geolocation coordinates
  * @param {Function} done The done() function to notify the unit tests as concluded
  */
 function nockContextBroker(options, done) {
@@ -597,6 +599,136 @@ function nockContextBroker(options, done) {
       }
     );
   }
+
+  // Nock the Context Broker to listen for geolocation updates via an
+  //  updateContext request
+  if (options.updateGeolocationNotification) {
+    contextBroker.post(
+      caConfig.CB_PATH + '/updateContext'
+    ).reply(function(uri, requestBody) {
+        // The updateContext request must include a position attribute including
+        //  a latitude and a longitude separated by a ','
+        var positionAttr = caHelper.getAttribute(
+          JSON.parse(requestBody).contextElements[0].attributes,
+          caConfig.DEVICE_ENTITY.POSITION_ATTR_NAME
+        );
+        var positionValue = positionAttr.value;
+        var positionArr = positionValue.split(',');
+        expect(positionArr[0].trim()).to.be.equal(caTestConfig.GOOGLE_MAPS_GEOLOCATION_SERVICE.RESPONSE.LATITUDE);
+        expect(positionArr[1].trim()).to.be.equal(caTestConfig.GOOGLE_MAPS_GEOLOCATION_SERVICE.RESPONSE.LONGITUDE);
+        // The updateContext request must include a location metadata with value 'WGS84'
+        expect(caHelper.getAttributeValue(positionAttr.metadatas, caConfig.DEVICE_ENTITY.LOCATION_METADATA_NAME)).
+          to.equal(caConfig.DEVICE_ENTITY.LOCATION_METADATA_VALUE);
+        // The updateContext request must include a TimeInstant metadata
+        expect(caHelper.getAttributeValue(positionAttr.metadatas, caConfig.DEVICE_ENTITY.TIMEINSTANT_METADATA_NAME)).
+          to.exist;
+        // The updateContext request must include a accuracy metadata
+        expect(caHelper.getAttributeValue(positionAttr.metadatas, caConfig.DEVICE_ENTITY.ACCURACY_METADATA_NAME)).
+          to.equal(caTestConfig.GOOGLE_MAPS_GEOLOCATION_SERVICE.RESPONSE.ACCURACY);
+        if (done) {
+          done();
+        }
+      }
+    );
+  }
+}
+
+/**
+ * Returns a geolocation update request options object to be passed to the request module
+ *  @return {object} The request module options
+ */
+function getGeolocationUpdateRequestOptions() {
+  var requestOptions = {
+    uri: 'http://' + caConfig.CA_HOST + ':' + caConfig.CA_PORT +
+      caConfig.CA_PATH + caConfig.CA_ROUTE_SUFFIXES.NOTIFY_GEOLOCATION,
+    method: 'POST',
+    headers: {
+      'Fiware-Service': caConfig.DEFAULT_SERVICE,
+      'Fiware-ServicePath': caConfig.DEFAULT_SERVICE_PATH
+    },
+    json: true,
+    body: {
+      'subscriptionId' : '1234567890ABCDF123456789',
+      'originator' : 'orion.contextBroker.instance',
+      'contextResponses' : [
+        {
+          'contextElement' : {
+            'attributes' : [
+              {
+                'name' : 'P1',
+                'type' : 'compound',
+                'value' : [
+                  {
+                    'name': 'mcc',
+                    'type': 'string',
+                    'value': '20A'
+                  },
+                  {
+                    'name': 'mnc',
+                    'type': 'string',
+                    'value': 'B'
+                  },
+                  {
+                    'name': 'lac',
+                    'type': 'string',
+                    'value': '6fba'
+                  },
+                  {
+                    'name': 'cell-id',
+                    'type': 'string',
+                    'value': '1d31FFF'
+                  }
+                ],
+                'metadatas' : [
+                  {
+                    'name': 'TimeInstant',
+                    'type': 'ISO8601',
+                    'value': '2015-07-20T09:55:04.028966Z'
+                  }
+                ]
+
+              }
+            ],
+            'type': 'gdl',
+            'isPattern': 'false',
+            'id': 'device-01'
+          },
+          'statusCode': {
+            'code': '200',
+            'reasonPhrase': 'OK'
+          }
+        }
+      ]
+    }
+  };
+  return requestOptions;
+}
+
+/**
+ * Nocks the Google Maps Geolocation API (https://developers.google.com/maps/documentation/geolocation/intro)
+ */
+function nockGoogleMapsGeolocationAPI() {
+  var googleMapsGeolocationAPI = nock(
+    'https://' + caTestConfig.GOOGLE_MAPS_GEOLOCATION_SERVICE.URI.HOST
+  );
+
+  googleMapsGeolocationAPI.post(
+    caTestConfig.GOOGLE_MAPS_GEOLOCATION_SERVICE.URI.PATH + caTestConfig.GOOGLE_MAPS_GEOLOCATION_SERVICE.URI.PARAMS
+  ).reply(function() {
+      return [
+        200,
+        JSON.stringify(
+          {
+            'location': {
+              'lat': caTestConfig.GOOGLE_MAPS_GEOLOCATION_SERVICE.RESPONSE.LATITUDE,
+              'lng': caTestConfig.GOOGLE_MAPS_GEOLOCATION_SERVICE.RESPONSE.LONGITUDE
+            },
+            'accuracy': caTestConfig.GOOGLE_MAPS_GEOLOCATION_SERVICE.RESPONSE.ACCURACY
+          }
+        )
+      ];
+    }
+  );
 }
 
 /**
@@ -635,7 +767,7 @@ function operationTestSuite(payload, interactionType) {
   it('should respond with a 200 code and \'OK\' reasonPhrase if valid payload',
     function(done) {
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -666,7 +798,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -700,7 +832,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -733,7 +865,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -777,7 +909,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -821,7 +953,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -865,7 +997,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -909,7 +1041,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -953,7 +1085,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -997,7 +1129,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -1041,7 +1173,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -1085,7 +1217,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -1129,7 +1261,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -1173,7 +1305,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -1210,7 +1342,7 @@ function operationTestSuite(payload, interactionType) {
         });
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -1257,7 +1389,7 @@ function operationTestSuite(payload, interactionType) {
       );
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -1327,7 +1459,7 @@ function operationTestSuite(payload, interactionType) {
         });
 
       request(
-        getRequestOptions(
+        getBlackButtonRequestOptions(
           {
             body: payload
           }
@@ -1409,7 +1541,7 @@ function operationTestSuite(payload, interactionType) {
     );
 
     request(
-      getRequestOptions(
+      getBlackButtonRequestOptions(
         {
           uri: 'http://' + caConfig.CA_HOST + ':' + caConfig.CA_PORT +
           caConfig.CA_PATH + caConfig.CA_CALLBACK_PATH,
@@ -1434,6 +1566,55 @@ function operationTestSuite(payload, interactionType) {
 }
 
 /**
+ * Main test suite covering the Context Adapter geolocation update operation
+ */
+function geolocationUpdateTestSuite() {
+  it('should update the geolocation coordinates in the Context Broker', function(done) {
+    nockGoogleMapsGeolocationAPI();
+
+    nockContextBroker(
+      {
+        updateGeolocationNotification: true
+      },
+      done
+    );
+
+    request(
+      getGeolocationUpdateRequestOptions(),
+      function(err, response, body) {
+        // The Context Adapter should reply successfully to the request as
+        //  soon as it receives it
+        expect(err).to.equal(null);
+        expect(response.statusCode).to.equal(200);
+        expect(body.contextResponses[0].statusCode.code).to.equal('200');
+        expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+
+        // Cell data must be valid hexadecimal numbers
+        var p1Value = caHelper.getAttributeValue(
+          body.contextResponses[0].contextElement.attributes,
+          caConfig.DEVICE_ENTITY.P1_ATTR_NAME);
+        var hexRegExp = /[0-9A-F]+/i;
+        expect(caHelper.getAttributeValue(
+          p1Value,
+          caConfig.DEVICE_ENTITY.P1_VALUES.CELL_ID
+        ).match(hexRegExp));
+        expect(caHelper.getAttributeValue(
+          p1Value,
+          caConfig.DEVICE_ENTITY.P1_VALUES.LAC
+        ).match(hexRegExp));
+        expect(caHelper.getAttributeValue(
+          p1Value,
+          caConfig.DEVICE_ENTITY.P1_VALUES.MCC
+        ).match(hexRegExp));
+        expect(caHelper.getAttributeValue(
+          p1Value,
+          caConfig.DEVICE_ENTITY.P1_VALUES.MNC
+        ).match(hexRegExp));
+      }
+    );
+  });
+}
+/**
  * Properties and functions exported by the module
  * @type {{server, startup: startup, exitGracefully: exitGracefully}}
  */
@@ -1441,7 +1622,7 @@ module.exports = {
   getUpdateContextPayload: getUpdateContextPayload,
   getNotificationPayload: getNotificationPayload,
   getServiceDescriptorResponse: getServiceDescriptorResponse,
-  getRequestOptions: getRequestOptions,
-  nockContextBroker: nockContextBroker,
-  operationTestSuite: operationTestSuite
+  getBlackButtonRequestOptions: getBlackButtonRequestOptions,
+  operationTestSuite: operationTestSuite,
+  geolocationUpdateTestSuite: geolocationUpdateTestSuite
 };
