@@ -30,6 +30,27 @@ var nock = require('nock');
 var request = require('request');
 
 /**
+ * Apply the attribute options passed to a request generation process
+ * @param contextElement The contextElement object being generated
+ * @param attributes The attribute options
+ */
+function applyAttributeOptions(contextElement, attributes) {
+  for (var i = 0; i < attributes.length; i++) {
+    if (attributes[i].value) {
+      caHelper.setAttribute(
+        contextElement.attributes[i],
+        attributes[i].name,
+        attributes[i].value
+      );
+    } else {
+      caHelper.removeAttribute(
+        contextElement.attributes,
+        attributes[i].name);
+    }
+  }
+}
+
+/**
  * Returns a valid and well-formed or invalid and not well-formed
  *  updateContext request depending on the options passed
  * @param {object} options Object including the properties which should
@@ -99,19 +120,9 @@ function getUpdateContextPayload(options) {
         delete payload.contextElements[0].isPattern;
       }
       if (options.contextElements.attributes && Array.isArray(options.contextElements.attributes)) {
-        for (var i = 0; i < options.contextElements.attributes.length; i++) {
-          if (options.contextElements.attributes[i].value) {
-            caHelper.setAttribute(
-              options.contextElements.attributes,
-              options.contextElements.attributes[i].name,
-              options.contextElements.attributes[i].value
-            );
-          } else {
-            caHelper.removeAttribute(
-              payload.contextElements[0].attributes,
-              options.contextElements.attributes[i].name);
-          }
-        }
+        applyAttributeOptions(
+          payload.contextElements[0],
+          options.contextElements.attributes);
       }
     }
     if (options.updateAction === false) {
@@ -197,19 +208,9 @@ function getNotificationPayload(options) {
       }
       if (options.contextResponses[0].contextElement.attributes &&
         Array.isArray(options.contextResponses[0].contextElement.attributes)) {
-        for (var i = 0; i < options.contextResponses[0].contextElement.attributes.length; i++) {
-          if (options.contextResponses[0].contextElement.attributes[i].value) {
-            caHelper.setAttribute(
-              payload.contextResponses[0].contextElement.attributes[i],
-              options.contextResponses[0].contextElement.attributes[i].name,
-              options.contextResponses[0].contextElement.attributes[i].value
-            );
-          } else {
-            caHelper.removeAttribute(
-              payload.contextResponses[0].contextElement.attributes,
-              options.contextResponses[0].contextElement.attributes[i].name);
-          }
-        }
+        applyAttributeOptions(
+          payload.contextResponses[0].contextElement,
+          options.contextResponses[0].contextElement.attributes);
       }
     }
     if (options.contextResponses[0].statusCode) {
@@ -673,9 +674,9 @@ function getGeolocationUpdateRequestOptions() {
                     'value': '6fba'
                   },
                   {
-                    "name": "cell-id",
-                    "type": "string",
-                    "value": "1d31FFF"
+                    'name': 'cell-id',
+                    'type': 'string',
+                    'value': '1d31FFF'
                   }
                 ],
                 'metadatas' : [
@@ -713,7 +714,7 @@ function nockGoogleMapsGeolocationAPI() {
 
   googleMapsGeolocationAPI.post(
     caTestConfig.GOOGLE_MAPS_GEOLOCATION_SERVICE.URI.PATH + caTestConfig.GOOGLE_MAPS_GEOLOCATION_SERVICE.URI.PARAMS
-  ).reply(function(uri, requestBody) {
+  ).reply(function() {
       return [
         200,
         JSON.stringify(
