@@ -1,1 +1,2 @@
-- [TASK] Documentation included about the management of geolocation update notification requests
+- [FEATURE] Use the TimeInstant metadata of the P1 attribute when updating a device geolocation if it exists or the
+ notification reception time otherwise

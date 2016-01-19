@@ -76,7 +76,7 @@ describe('Context Adapter server:', function() {
   describe('HTTP methods:', function() {
     it('should respond with 404 - Not Found if invalid HTTP method', function(done) {
       request(
-        testHelper.getRequestOptions(
+        testHelper.getBlackButtonRequestOptions(
           {
             method: 'PUT'
           }
@@ -96,7 +96,7 @@ describe('Context Adapter server:', function() {
   describe('Headers:', function() {
     it('should respond with 400 - Bad Request if missing Fiware-Service header', function(done) {
       request(
-        testHelper.getRequestOptions(
+        testHelper.getBlackButtonRequestOptions(
           {
             headers: ['Fiware-Service']
           }
@@ -113,7 +113,7 @@ describe('Context Adapter server:', function() {
 
     it('should respond with 400 - Bad Request if missing Fiware-ServicePath header', function(done) {
       request(
-        testHelper.getRequestOptions(
+        testHelper.getBlackButtonRequestOptions(
           {
             headers: ['Fiware-ServicePath']
           }
@@ -132,7 +132,7 @@ describe('Context Adapter server:', function() {
   describe('Routes:', function() {
     it('should respond with 404 - Not Found if invalid route', function(done) {
       request(
-        testHelper.getRequestOptions(
+        testHelper.getBlackButtonRequestOptions(
           {
             uri: 'http://' + caConfig.CA_HOST + ':' + caConfig.CA_PORT +
             caConfig.CA_PATH + '/invalidPath'
@@ -149,10 +149,10 @@ describe('Context Adapter server:', function() {
     });
   });
 
-  describe('updateContext requests:', function() {
+  describe('Requests:', function() {
     it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if empty payload', function(done) {
       request(
-        testHelper.getRequestOptions(),
+        testHelper.getBlackButtonRequestOptions(),
         function(err, response, body) {
           expect(err).to.equal(null);
           expect(response.statusCode).to.equal(200);
@@ -167,7 +167,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s id',
         function (done) {
           request(
-            testHelper.getRequestOptions(
+            testHelper.getBlackButtonRequestOptions(
               {
                 body: testHelper.getUpdateContextPayload({
                   contextElements: {
@@ -189,7 +189,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s type',
         function (done) {
           request(
-            testHelper.getRequestOptions(
+            testHelper.getBlackButtonRequestOptions(
               {
                 body: testHelper.getUpdateContextPayload({
                   contextElements: {
@@ -211,7 +211,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s isPattern',
         function (done) {
           request(
-            testHelper.getRequestOptions(
+            testHelper.getBlackButtonRequestOptions(
               {
                 body: testHelper.getUpdateContextPayload({
                   contextElements: {
@@ -233,7 +233,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
         caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME + ' attribute', function (done) {
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: testHelper.getUpdateContextPayload({
                 contextElements: {
@@ -257,7 +257,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
         caConfig.BUTTON_ENTITY.CA_SERVICE_ID_ATTR_NAME + ' attribute', function (done) {
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: testHelper.getUpdateContextPayload({
                 contextElements: {
@@ -281,7 +281,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
         caConfig.BUTTON_ENTITY.CA_OPERATION_ACTION_ATTR_NAME + ' attribute', function (done) {
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: testHelper.getUpdateContextPayload({
                 contextElements: {
@@ -318,7 +318,7 @@ describe('Context Adapter server:', function() {
         );
 
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: updateContextPayload
             }
@@ -350,7 +350,7 @@ describe('Context Adapter server:', function() {
         );
 
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: updateContextPayload
             }
@@ -382,7 +382,7 @@ describe('Context Adapter server:', function() {
         );
 
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: updateContextPayload
             }
@@ -454,7 +454,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s id',
         function (done) {
           request(
-            testHelper.getRequestOptions(
+            testHelper.getBlackButtonRequestOptions(
               {
                 body: testHelper.getNotificationPayload({
                   contextResponses: [
@@ -480,7 +480,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s type',
         function (done) {
           request(
-            testHelper.getRequestOptions(
+            testHelper.getBlackButtonRequestOptions(
               {
                 body: testHelper.getNotificationPayload({
                   contextResponses: [
@@ -506,7 +506,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s isPattern',
         function (done) {
           request(
-            testHelper.getRequestOptions(
+            testHelper.getBlackButtonRequestOptions(
               {
                 body: testHelper.getNotificationPayload({
                   contextResponses: [
@@ -532,7 +532,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
         caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME + ' attribute', function (done) {
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: testHelper.getNotificationPayload({
                 contextResponses: [
@@ -560,7 +560,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
         caConfig.BUTTON_ENTITY.SERVICE_ID_ATTR_NAME + ' attribute', function (done) {
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: testHelper.getNotificationPayload({
                 contextResponses: [
@@ -588,7 +588,7 @@ describe('Context Adapter server:', function() {
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
         caConfig.BUTTON_ENTITY.OPERATION_ACTION_ATTR_NAME + ' attribute', function (done) {
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: testHelper.getNotificationPayload({
                 contextResponses: [
@@ -633,7 +633,7 @@ describe('Context Adapter server:', function() {
         );
 
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: notificationPayload
             }
@@ -669,7 +669,7 @@ describe('Context Adapter server:', function() {
         );
 
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: notificationPayload
             }
@@ -706,7 +706,7 @@ describe('Context Adapter server:', function() {
         );
 
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: notificationPayload
             }
@@ -743,7 +743,7 @@ describe('Context Adapter server:', function() {
         );
 
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: notificationPayload
             }
@@ -781,7 +781,7 @@ describe('Context Adapter server:', function() {
         );
 
         request(
-          testHelper.getRequestOptions(
+          testHelper.getBlackButtonRequestOptions(
             {
               body: notificationPayload
             }
@@ -850,5 +850,8 @@ describe('Context Adapter server:', function() {
         );
       });
     }
+
+    describe('geolocation update requests',
+      testHelper.geolocationUpdateTestSuite);
   });
 });
