@@ -1,4 +1,4 @@
-/* globals module, process */
+/* globals module */
 
 /*
  * Copyright 2015 Telefónica Investigación y Desarrollo, S.A.U
