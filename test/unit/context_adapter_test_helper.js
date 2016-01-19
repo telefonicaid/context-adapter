@@ -660,12 +660,12 @@ function getGeolocationUpdateRequestOptions() {
                   {
                     'name': 'mcc',
                     'type': 'string',
-                    'value': '208'
+                    'value': '20A'
                   },
                   {
                     'name': 'mnc',
                     'type': 'string',
-                    'value': '10'
+                    'value': 'B'
                   },
                   {
                     'name': 'lac',
@@ -1587,6 +1587,28 @@ function geolocationUpdateTestSuite() {
         expect(response.statusCode).to.equal(200);
         expect(body.contextResponses[0].statusCode.code).to.equal('200');
         expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+
+        // Cell data must be valid hexadecimal numbers
+        var p1Value = caHelper.getAttributeValue(
+          body.contextResponses[0].contextElement.attributes,
+          caConfig.DEVICE_ENTITY.P1_ATTR_NAME);
+        var hexRegExp = /[0-9A-F]+/i;
+        expect(caHelper.getAttributeValue(
+          p1Value,
+          caConfig.DEVICE_ENTITY.P1_VALUES.CELL_ID
+        ).match(hexRegExp));
+        expect(caHelper.getAttributeValue(
+          p1Value,
+          caConfig.DEVICE_ENTITY.P1_VALUES.LAC
+        ).match(hexRegExp));
+        expect(caHelper.getAttributeValue(
+          p1Value,
+          caConfig.DEVICE_ENTITY.P1_VALUES.MCC
+        ).match(hexRegExp));
+        expect(caHelper.getAttributeValue(
+          p1Value,
+          caConfig.DEVICE_ENTITY.P1_VALUES.MNC
+        ).match(hexRegExp));
       }
     );
   });
