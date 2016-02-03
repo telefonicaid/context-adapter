@@ -12,7 +12,7 @@
 * [Installation](#section3)
 * [Running the Context Adapter](#section4)
 * [Test coverage](#section5)
-* [How to contribute] (#section6)
+* [Contribution guidelines] (#section6)
 * [Additional development documentation] (#section7)
 * [Contact](#section8)
 
@@ -487,7 +487,9 @@ yum localinstall --nogpg <nameOfTheRPM>.rpm
 
 ##<a id="section4"></a>Running the Context Adapter
 1. To run the Context Adapter component, just execute:
-<pre> npm start </pre>
+```bash
+./bin/context-adapter
+```
 
 The Context Adapter component provides the user with 2 mechanisms to configure the component to the concrete needs of the user:
 
@@ -536,38 +538,190 @@ exposed by the component. This set includes:
 - Attending third party's service updates
 
 ### Running the tests
-1. To run the tests, just execute:
-<pre> make test </pre>
+In order to execute the test suite you must have the Grunt client installed. You can install it using the following command
+(you will need root permissions):
+```bash
+npm install -g grunt-cli
+```
 
-Take into consideration that the tests can be run using distint configurations using environment variables or properly
-setting the [`config.js`](https://github.com/telefonicaid/context-adapter/blob/develop/config.js) file.
+Once the client is installed and the dependencies are downloaded, you can execute the tests using:
+```
+grunt test
+```
+
+This will execute the functional tests and the syntax checking as well.
+
+Take into consideration that the tests can be run using distinct configurations using environment variables or properly
+setting the [`config.js`](https://github.com/telefonicaid/context-adapter/blob/develop/config.js) file as explained in
+[Running the Context Adapter](#section4).
 
 [Top](#section0)
 
-##<a id="section6"></a>How to contribute
+##<a id="section6"></a>Contribution guidelines
 
-Would you like to contribute to the project? This is how you can do it:
+### <a id="section10.1"></a> Overview
+Being an open source project, everyone can contribute, provided that it respects the following points:
+* Before contributing any code, the author must make sure all the tests work (see below how to run the tests).
+* Developed code must adhere to the syntax guidelines enforced by the linters.
+* Code must be developed following the branching model and changelog policies defined below.
+* For any new feature added, unit tests must be provided, following the example of the ones already created.
 
+In order to start contributing:
 1. Fork this repository clicking on the "Fork" button on the upper-right area of the page.
 2. Clone your just forked repository:
-<pre>git clone https://github.com/your-github-username/context-adapter.git</pre>
-3. Add the main Context Adapter repository as a remote to your forked repository (use any name for your remote repository, it does not have to be `context-adapter`, although we will use it in the next steps):
-<pre>git remote add context-adapter https://github.com/telefonicaid/context-adapter.git</pre>
-4. Synchronize the ```develop``` branch in your forked repository with the ```develop``` branch in the main Context Adapter repository:
-<br/><br/>(step 4.1, just in case you were not in the ```develop``` branch yet) <pre>git checkout develop</pre>
-(step 4.2)<pre>git fetch context-adapter</pre>
-(step 4.3)<pre>git rebase context-adapter/develop</pre>
-5. Create a new local branch for your new code (currently we use the prefixes: ```feature/``` for new features, ```task/``` for maintenance and documentation issues and ```bug/``` for bugs):
-<pre>git checkout -b feature/some-new-feature</pre>
-6. Include your changes and create the corresponding commits.
-7. To assure that your code will land nicely, repeat steps 4.2 and 4.3 from your ```feature/some-new-feature``` branch to synchronize it with the latest code which may have landed in the ```develop``` branch of the main context-adapter repository during your implementation.
-8. Push your code to your forked repository hosted in Github:
-<pre>git push origin feature/some-new-feature</pre>
-9. Launch a new pull request from your forked repository to the ```develop``` branch of the main Context Adapter repository. You may find some active pull requests available at <a href="https://github.com/telefonicaid/context-adapter/pulls" target="_blank">https://github.com/telefonicaid/context-adapter/pulls</a>.
-10. Assign the pull request to any of the main Context Adapter developers (currently, [@gtorodelvalle](https://github.com/gtorodelvalle) or [@dmoranj](https://github.com/dmoranj)) for review.
-11. After the review process is successfully completed, your code will land into the ```develop``` branch of the main Context Adapter repository. Congratulations!!!
+```
+git clone https://github.com/your-github-username/context-adapter.git
+```
+3. Add the main context-adapter repository as a remote to your forked repository (use any name for your remote
+repository, it does not have to be context-adapter, although we will use it in the next steps):
+```
+git remote add context-adapter https://github.com/telefonicaid/context-adapter.git
+```
 
-For additional contributions, just repeat these steps from step 4 on.
+Before starting your contribution, remember to synchronize the `develop` branch in your forked repository with the `develop`
+branch in the main lcontext-adapter repository following the next steps:
+
+1. Change to your local `develop` branch (in case you are not in it already):
+```
+  git checkout develop
+```
+2. Fetch the remote changes:
+```
+  git fetch context-adapter
+```
+3. Merge them:
+```
+  git rebase context-adapter/develop
+```
+
+Contributions following these guidelines will be added to the `develop` branch, and released in the next version. The
+release process is explained in the [Releasing](#section6.9) section below.
+
+
+###<a id="section6.2"></a> Branching model
+There are two special branches in the repository:
+
+* `master`: holds the code for the last stable version of the project. It is only updated when a new version is released.
+* `develop`: contains the last stable development code. New features and bug fixes are always merged to `develop`.
+
+In order to start developing a new feature or refactoring, a new branch should be created with name `task/<taskName>`
+in the newly forked repository.
+This new branch must be created from the current version of the `develop` branch (remember to fetch the latest changes from
+the remote `develop` branch before creating this new branch).
+Once the new functionality has been completed, a pull request should be created from the
+new branch to the `develop` branch in the main remote repository.
+Remember to check both the linters and the tests before creating the pull request.
+
+Fixing bugs follow the same branching guidelines as in the case of adding a new feature or refactoring code with the
+exception of the branch name. In the case of bug fixes, the new branch should be called `bug/<bugName>`.
+
+There are another set of branches called `release/<versionNumber>`, one for each version of the product. These branches
+point to each one of the released versions of the project. They are permanent and they are created with each release.
+
+###<a id="section6.3"></a> Changelog
+The project contains a version changelog file, called `CHANGES_NEXT_RELEASE`, that can be found in the root of the project.
+Whenever a new feature or bug fix is going to be merged with `develop`, a new entry should be added to this changelog.
+The new entry should contain the reference number of the issue it is solving (if any).
+
+When a new version is released, the changelog is cleared, and remains fixed in the last commit of that version. The
+content of the changelog is also moved to the release description in the Github release.
+
+###<a id="section6.4"> Coding guidelines
+Coding guidelines are defined via the provided `.jshintrc` and `.gjslintrc` flag files. The latter requires Python and
+its use can be disabled while creating the project skeleton with grunt-init.
+To check source code style, type:
+```bash
+grunt lint
+```
+
+Checkstyle reports can be used together with Jenkins to monitor project quality metrics by means of Checkstyle
+and Violations plugins.
+To generate Checkstyle and JSLint reports under `report/lint/`, type:
+```bash
+grunt lint-report
+```
+
+###<a id="section6.5"></a> Testing
+The test environment is preconfigured to run the [Mocha](http://visionmedia.github.io/mocha/) Test Runner with support
+for the [Chai](http://chaijs.com/) assertion library as well as for [Sinon](http://sinonjs.org/) spies, stubs, etc.,
+following a [BDD](http://chaijs.com/api/bdd/) testing style with `chai.expect` and `chai.should()` available globally
+while executing tests, as well as the [Sinon-Chai](http://chaijs.com/plugins/sinon-chai) plugin.
+
+Module mocking during testing can be done with [proxyquire](https://github.com/thlorenz/proxyquire).
+
+To run tests, type:
+```bash
+grunt test
+```
+
+Tests reports can be used together with Jenkins to monitor project quality metrics by means of TAP or XUnit plugins.
+To generate TAP report in `report/test/unit_tests.tap`, type
+```bash
+grunt test-report
+```
+
+###<a id="section6.6"></a> Continuous testing
+Support for continuous testing is provided so that tests are run when any source file or test is modified.
+For continuous testing, type:
+```bash
+grunt watch
+```
+
+###<a id="section6.7"></a> Source code documentation
+HTML code documentation can be generated under the `site/doc/` path. It can be used together with Jenkins by means of
+DocLinks plugin.
+For compiling source code documentation, type:
+```bash
+grunt doc
+```
+
+###<a id="section6.8"></a> Code coverage
+A very good practice is to measure the code coverage of your tests.
+
+To generate an HTML coverage report under the `site/coverage/` path and to print out a summary, type:
+```bash
+grunt coverage
+```
+
+To generate a Cobertura report in `report/coverage/cobertura-coverage.xml` that can be used together with Jenkins to
+monitor project quality metrics by means of Cobertura plugin, type
+```bash
+grunt coverage-report
+```
+
+###<a id="section6.8"></a> Code complexity
+Another very good practice is to analise code complexity.
+
+Support for using Plato and storing the generated report in the `site/report/` path is provided. This capability can be
+used together with Jenkins by means of DocLinks plugin.
+
+To generate a code complexity report, type:
+```bash
+grunt complexity
+```
+
+###<a id="section6.9"></a> Releasing
+The process of making a release consists of the following steps and should be made by any of the owners or administrators
+of the main repository:
+
+1. Create a new task branch changing the development version number in the `package.json` file (with a suffix `-next`)
+to the new target version (without any suffix), and create a pull request of this new task branch into `develop`. Remember
+to delete the temporary created task branch.
+2. Create a release branch named `release/<versionNumber>` from the last version of `develop` using the corresponding
+version number.
+3. Create a new release in Github setting the tag version as `release-<versionNumber>` from the new release branch
+`release/<versionNumber>` and publish it.
+5. Create a pull request from the new release branch `release/<versionNumber>` to `master`.
+6. Create a new task branch to prepare the `develop` branch for the next release, adding the `-next` suffix to the
+current version number in the `package.json` file (to signal this as the development version) and removing the contents
+of the `CHANGES_NEXT_RELEASE` changelog file. Create a pull request from this new task branch to `develop`.
+Remember to delete the temporary created task branch.
+
+To further guide you through your first contributions, we have created the label [```mentored```](https://github.com/telefonicaid/context-adapter/labels/mentored)
+which are assigned to those bugs and issues simple and interesting enough to be solved by people new to the project.
+Feel free to assign any of them to yourself and do not hesitate to mention any of the main developers
+(this is, [@gtorodelvalle](https://github.com/gtorodelvalle) or [@dmoranj](https://github.com/dmoranj)
+in the issue's comments to get help from them during its resolution. They will be glad to help you.
 
 [Top](#section0)
 
@@ -583,95 +737,9 @@ grunt --help
 The following sections show the available options in detail.
 
 
-### Testing
-[Mocha](http://visionmedia.github.io/mocha/) Test Runner + [Chai](http://chaijs.com/) Assertion Library + [Sinon](http://sinonjs.org/) Spies, stubs.
-
-The test environment is preconfigured to run [BDD](http://chaijs.com/api/bdd/) testing style with
-`chai.expect` and `chai.should()` available globally while executing tests, as well as the [Sinon-Chai](http://chaijs.com/plugins/sinon-chai) plugin.
-
-Module mocking during testing can be done with [proxyquire](https://github.com/thlorenz/proxyquire)
-
-To run tests, type
-```bash
-grunt test
-```
-
-Tests reports can be used together with Jenkins to monitor project quality metrics by means of TAP or XUnit plugins.
-To generate TAP report in `report/test/unit_tests.tap`, type
-```bash
-grunt test-report
-```
-
-
-### Coding guidelines
-jshint, gjslint
-
-Uses provided .jshintrc and .gjslintrc flag files. The latter requires Python and its use can be disabled
-while creating the project skeleton with grunt-init.
-To check source code style, type
-```bash
-grunt lint
-```
-
-Checkstyle reports can be used together with Jenkins to monitor project quality metrics by means of Checkstyle
-and Violations plugins.
-To generate Checkstyle and JSLint reports under `report/lint/`, type
-```bash
-grunt lint-report
-```
-
-
-### Continuous testing
-
-Support for continuous testing by modifying a src file or a test.
-For continuous testing, type
-```bash
-grunt watch
-```
-
-
-### Source Code documentation
-dox-foundation
-
-Generates HTML documentation under `site/doc/`. It can be used together with jenkins by means of DocLinks plugin.
-For compiling source code documentation, type
-```bash
-grunt doc
-```
-
-
-### Code Coverage
-Istanbul
-
-Analizes the code coverage of your tests.
-
-To generate an HTML coverage report under `site/coverage/` and to print out a summary, type
-```bash
-# Use git-bash on Windows
-grunt coverage
-```
-
-To generate a Cobertura report in `report/coverage/cobertura-coverage.xml` that can be used together with Jenkins to
-monitor project quality metrics by means of Cobertura plugin, type
-```bash
-# Use git-bash on Windows
-grunt coverage-report
-```
-
-
-### Code complexity
-Plato
-
-Analizes code complexity using Plato and stores the report under `site/report/`. It can be used together with jenkins
-by means of DocLinks plugin.
-For complexity report, type
-```bash
-grunt complexity
-```
-
 ### PLC
 
-Update the contributors for the project
+To update the contributors of the project, type:
 ```bash
 grunt contributors
 ```
@@ -714,7 +782,7 @@ grunt site
 
 This command will only work after the developer has executed init-dev-env (that's the goal that will create the detached site).
 
-This command will also launch the coverage, doc and complexity task (see in the above sections).
+This command will also launch the coverage, doc and complexity task (see the sections above).
 
 ##<a id="section8"></a>Contact
 * Germán Toro del Valle (<a href="mailto:german.torodelvalle@telefonica.com">german.torodelvalle@telefonica.com</a>, <a href="http://www.twitter.com/gtorodelvalle" target="_blank">@gtorodelvalle</a>)
