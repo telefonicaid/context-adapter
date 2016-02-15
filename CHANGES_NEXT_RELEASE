@@ -1,1 +1,2 @@
 - [TASK] Contribution guidelines documentation updated and improved
+- [FEATURE] Log as warning whenever the Context Broker responds with an error (#65)

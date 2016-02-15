@@ -750,7 +750,6 @@ describe('Context Adapter server:', function() {
           ),
           function (err, response, body) {
             expect(err).to.equal(null);
-            expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
             expect(body.contextResponses[0].statusCode.code).to.equal('200');
             expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
