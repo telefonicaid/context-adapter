@@ -1,7 +1,2 @@
-- [TASK] Documentation about the new geolocation update feature
-- [TASK] Documentation about the CA functioning
-- [TASK] Unit tests for the new geolocation update feature included
-- [FEATURE] Use the TimeInstant metadata of the P1 attribute when updating a device geolocation if it exists or the
- notification reception time otherwise
-- [FEATURE] Specific endpoint for geolocation updates
-- [FEATURE] Expect all cell data as hexadecimal numbers
+- [TASK] Contribution guidelines documentation updated and improved
+- [FEATURE] Log as warning whenever the Context Broker responds with an error (#65)
