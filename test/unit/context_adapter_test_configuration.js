@@ -28,6 +28,13 @@
 var caConfig = require('../../lib/context_adapter_configuration');
 
 module.exports = {
+  API_OPERATION: {
+    NOTIFY: 'notify',
+    ADMIN: {
+      SET_LOG_LEVEL: 'setLogLevel'
+    },
+    VERSION: 'version'
+  },
   GOOGLE_MAPS_GEOLOCATION_SERVICE: {
     URI: {
       HOST: 'www.googleapis.com',
