@@ -20,6 +20,7 @@
     "node": ">=0.10.22"
   },
   "scripts": {
+    "start": "./bin/context-adapter",
     "test": "grunt test"
   },
   "devDependencies": {
