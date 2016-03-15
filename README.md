@@ -10,11 +10,12 @@
     * [Geolocation update] (#section12)
 * [Dependencies](#section2)
 * [Installation](#section3)
-* [Running the Context Adapter](#section4)
-* [Test coverage](#section5)
-* [Contribution guidelines] (#section6)
-* [Additional development documentation] (#section7)
-* [Contact](#section8)
+* [Automatic deployment using Docker](#section4)
+* [Running the Context Adapter](#section5)
+* [Test coverage](#section6)
+* [Contribution guidelines] (#section7)
+* [Additional development documentation] (#section8)
+* [Contact](#section9)
 
 ##<a id="section1"></a> Introduction
 
@@ -52,7 +53,7 @@ In this scenario, the Context Broker is properly configured to redirect `updateC
 as the result of a Black Button click.
 
 To configure the Context Adapter to work as a context provider, the `CA_MODE` configuration variable must be set to
-`context-provider` as mentioned in the [Running the Context Adapter](#section4) section below.
+`context-provider` as mentioned in the [Running the Context Adapter](#section5) section below.
 
 In this scenario, the Context Broker redirects to the Context Adapter (more concretely to the path `/v1/updateContext`,
 where the `/v1` part is configurable)  an `updateContext` request such as the following one:
@@ -178,7 +179,7 @@ In this scenario, the Context Broker is properly configured to send notification
 (more concretely to the path `/v1/notify`, where the `/v1` part is configurable) as the result of a Black Button click.
 
 To configure the Context Adapter to work as a context provider, the `CA_MODE` configuration variable must be set to
-`notification` as mentioned in the [Running the Context Adapter](#section4) section below.
+`notification` as mentioned in the [Running the Context Adapter](#section5) section below.
 
 In this scenario, the Context Broker sends notification requests to the Context Adapter such as the following one:
 
@@ -485,7 +486,25 @@ yum localinstall --nogpg <nameOfTheRPM>.rpm
 ```
 [Top](#section0)
 
-##<a id="section4"></a>Running the Context Adapter
+## <a id="section4"></a>Automatic deployment using Docker
+
+A [`Dockerfile`](https://github.com/telefonicaid/fiware-sth-comet/blob/master/Dockerfile) file has been included in this very repository to quickly and easily start your own instance of the Context Adapter component.
+
+To do it, follow the next steps once you have installed Docker in your machine:
+
+1. Navigate to the path where this repository was cloned.
+
+2. Build your Context Adapter image:
+```bash
+docker build -t my_context_adapter:my_tag .
+```
+
+3. Run the Context Adapter image:
+```bash
+docker run -t -i my-context-adapter:my-tag
+```
+
+## <a id="section5"></a>Running the Context Adapter
 1. To run the Context Adapter component, just execute:
 ```bash
 ./bin/context-adapter
@@ -529,7 +548,7 @@ configure it, please visit [https://www.npmjs.com/package/logops](https://www.np
 
 [Top](#section0)
 
-##<a id="section5"></a> Test coverage
+## <a id="section6"></a> Test coverage
 The Context Adapter component source code includes a set of tests to validate the correct functioning of the whole set of capabilities
 exposed by the component. This set includes:
 
@@ -553,13 +572,13 @@ This will execute the functional tests and the syntax checking as well.
 
 Take into consideration that the tests can be run using distinct configurations using environment variables or properly
 setting the [`config.js`](https://github.com/telefonicaid/context-adapter/blob/develop/config.js) file as explained in
-[Running the Context Adapter](#section4).
+[Running the Context Adapter](#section5).
 
 [Top](#section0)
 
-##<a id="section6"></a>Contribution guidelines
+## <a id="section7"></a>Contribution guidelines
 
-### <a id="section10.1"></a> Overview
+### <a id="section7.1"></a> Overview
 Being an open source project, everyone can contribute, provided that it respects the following points:
 * Before contributing any code, the author must make sure all the tests work (see below how to run the tests).
 * Developed code must adhere to the syntax guidelines enforced by the linters.
@@ -595,10 +614,10 @@ branch in the main lcontext-adapter repository following the next steps:
 ```
 
 Contributions following these guidelines will be added to the `develop` branch, and released in the next version. The
-release process is explained in the [Releasing](#section6.9) section below.
+release process is explained in the [Releasing](#section7.9) section below.
 
 
-###<a id="section6.2"></a> Branching model
+### <a id="section7.2"></a> Branching model
 There are two special branches in the repository:
 
 * `master`: holds the code for the last stable version of the project. It is only updated when a new version is released.
@@ -618,7 +637,7 @@ exception of the branch name. In the case of bug fixes, the new branch should be
 There are another set of branches called `release/<versionNumber>`, one for each version of the product. These branches
 point to each one of the released versions of the project. They are permanent and they are created with each release.
 
-###<a id="section6.3"></a> Changelog
+### <a id="section7.3"></a> Changelog
 The project contains a version changelog file, called `CHANGES_NEXT_RELEASE`, that can be found in the root of the project.
 Whenever a new feature or bug fix is going to be merged with `develop`, a new entry should be added to this changelog.
 The new entry should contain the reference number of the issue it is solving (if any).
@@ -626,7 +645,7 @@ The new entry should contain the reference number of the issue it is solving (if
 When a new version is released, the changelog is cleared, and remains fixed in the last commit of that version. The
 content of the changelog is also moved to the release description in the Github release.
 
-###<a id="section6.4"> Coding guidelines
+### <a id="section7.4"> Coding guidelines
 Coding guidelines are defined via the provided `.jshintrc` and `.gjslintrc` flag files. The latter requires Python and
 its use can be disabled while creating the project skeleton with grunt-init.
 To check source code style, type:
@@ -641,7 +660,7 @@ To generate Checkstyle and JSLint reports under `report/lint/`, type:
 grunt lint-report
 ```
 
-###<a id="section6.5"></a> Testing
+### <a id="section7.5"></a> Testing
 The test environment is preconfigured to run the [Mocha](http://visionmedia.github.io/mocha/) Test Runner with support
 for the [Chai](http://chaijs.com/) assertion library as well as for [Sinon](http://sinonjs.org/) spies, stubs, etc.,
 following a [BDD](http://chaijs.com/api/bdd/) testing style with `chai.expect` and `chai.should()` available globally
@@ -660,14 +679,14 @@ To generate TAP report in `report/test/unit_tests.tap`, type
 grunt test-report
 ```
 
-###<a id="section6.6"></a> Continuous testing
+### <a id="section7.6"></a> Continuous testing
 Support for continuous testing is provided so that tests are run when any source file or test is modified.
 For continuous testing, type:
 ```bash
 grunt watch
 ```
 
-###<a id="section6.7"></a> Source code documentation
+### <a id="section7.7"></a> Source code documentation
 HTML code documentation can be generated under the `site/doc/` path. It can be used together with Jenkins by means of
 DocLinks plugin.
 For compiling source code documentation, type:
@@ -675,7 +694,7 @@ For compiling source code documentation, type:
 grunt doc
 ```
 
-###<a id="section6.8"></a> Code coverage
+### <a id="section7.8"></a> Code coverage
 A very good practice is to measure the code coverage of your tests.
 
 To generate an HTML coverage report under the `site/coverage/` path and to print out a summary, type:
@@ -689,7 +708,7 @@ monitor project quality metrics by means of Cobertura plugin, type
 grunt coverage-report
 ```
 
-###<a id="section6.8"></a> Code complexity
+### <a id="section7.8"></a> Code complexity
 Another very good practice is to analise code complexity.
 
 Support for using Plato and storing the generated report in the `site/report/` path is provided. This capability can be
@@ -700,7 +719,7 @@ To generate a code complexity report, type:
 grunt complexity
 ```
 
-###<a id="section6.9"></a> Releasing
+### <a id="section7.9"></a> Releasing
 The process of making a release consists of the following steps and should be made by any of the owners or administrators
 of the main repository:
 
@@ -725,7 +744,7 @@ in the issue's comments to get help from them during its resolution. They will b
 
 [Top](#section0)
 
-##<a id="section7"></a>Additional development documentation
+## <a id="section8"></a>Additional development documentation
 ### Project build
 The project is managed using Grunt Task Runner.
 
@@ -784,7 +803,7 @@ This command will only work after the developer has executed init-dev-env (that'
 
 This command will also launch the coverage, doc and complexity task (see the sections above).
 
-##<a id="section8"></a>Contact
+## <a id="section9"></a>Contact
 * Germán Toro del Valle (<a href="mailto:german.torodelvalle@telefonica.com">german.torodelvalle@telefonica.com</a>, <a href="http://www.twitter.com/gtorodelvalle" target="_blank">@gtorodelvalle</a>)
 * Daniel Morán Jiménez (<a href="mailto:daniel.moranjimenez@telefonica.com">daniel.moranjimenez@telefonica.com</a>)
 
