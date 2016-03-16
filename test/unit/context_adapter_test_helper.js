@@ -454,11 +454,12 @@ function getServiceDescriptorResponse(options) {
  *  and will not include the 'Fiware-Service ' header
  *  @return {object} The request module options
  */
-function getBlackButtonRequestOptions(options) {
+function getBlackButtonRequestOptions(type, options) {
   options = options || {};
+
   var requestOptions = {
     uri: options.uri || 'http://' + caConfig.CA_HOST + ':' + caConfig.CA_PORT +
-    caConfig.CA_PATH + '/updateContext',
+      caConfig.CA_PATH,
     method: options.method || 'POST',
     headers: {
       'Fiware-Service': caConfig.DEFAULT_SERVICE,
@@ -471,6 +472,24 @@ function getBlackButtonRequestOptions(options) {
     options.headers.forEach(function(header) {
       delete requestOptions.headers[header];
     });
+  }
+
+  switch(type) {
+    case caTestConfig.API_OPERATION.NOTIFY:
+      requestOptions.uri += caConfig.CA_ROUTE_SUFFIXES.UPDATE_CONTEXT;
+      break;
+    case caTestConfig.API_OPERATION.ADMIN.SET_LOG_LEVEL:
+      requestOptions.uri = 'http://' + caConfig.CA_HOST + ':' + caConfig.CA_PORT +
+        caConfig.CA_ROUTE_SUFFIXES.ADMIN_SET_LOG_LEVEL;
+      if (options.level) {
+        requestOptions.qs = {
+          level: options.level
+        };
+      }
+      delete requestOptions.headers;
+      delete requestOptions.json;
+      delete requestOptions.body;
+      break;
   }
   return requestOptions;
 }
@@ -768,6 +787,7 @@ function operationTestSuite(payload, interactionType) {
     function(done) {
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -799,6 +819,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -833,6 +854,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -866,6 +888,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -910,6 +933,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -954,6 +978,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -998,6 +1023,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -1042,6 +1068,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -1086,6 +1113,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -1130,6 +1158,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -1174,6 +1203,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -1218,6 +1248,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -1262,6 +1293,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -1306,6 +1338,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -1343,6 +1376,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -1390,6 +1424,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -1460,6 +1495,7 @@ function operationTestSuite(payload, interactionType) {
 
       request(
         getBlackButtonRequestOptions(
+          caTestConfig.API_OPERATION.NOTIFY,
           {
             body: payload
           }
@@ -1542,9 +1578,10 @@ function operationTestSuite(payload, interactionType) {
 
     request(
       getBlackButtonRequestOptions(
+        null,
         {
           uri: 'http://' + caConfig.CA_HOST + ':' + caConfig.CA_PORT +
-          caConfig.CA_PATH + caConfig.CA_CALLBACK_PATH,
+            caConfig.CA_PATH + caConfig.CA_CALLBACK_PATH,
           body: {
             buttonId: '<button-id>',
             externalId: '<external-id>',
@@ -1614,6 +1651,30 @@ function geolocationUpdateTestSuite() {
     );
   });
 }
+
+/**
+ * Valid log level test
+ * @param level The log level
+ * @param done The done() function
+ */
+function validLogLevelChangeTest(level, done) {
+  request(
+    getBlackButtonRequestOptions(
+      caTestConfig.API_OPERATION.ADMIN.SET_LOG_LEVEL,
+      {
+        level: level
+      }
+    ),
+    function (err, response) {
+      console.log(err);
+      expect(err).to.equal(null);
+      expect(response.statusCode).to.equal(200);
+      expect(response.statusMessage).to.equal('OK');
+      done();
+    }
+  );
+}
+
 /**
  * Properties and functions exported by the module
  * @type {{server, startup: startup, exitGracefully: exitGracefully}}
@@ -1624,5 +1685,6 @@ module.exports = {
   getServiceDescriptorResponse: getServiceDescriptorResponse,
   getBlackButtonRequestOptions: getBlackButtonRequestOptions,
   operationTestSuite: operationTestSuite,
-  geolocationUpdateTestSuite: geolocationUpdateTestSuite
+  geolocationUpdateTestSuite: geolocationUpdateTestSuite,
+  validLogLevelChangeTest: validLogLevelChangeTest
 };

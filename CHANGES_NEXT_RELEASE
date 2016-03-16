@@ -1,2 +1,2 @@
-- [TASK] Contribution guidelines documentation updated and improved
-- [FEATURE] Log as warning whenever the Context Broker responds with an error (#65)
+- [FEATURE] Expose the possibility to change the log level through the API
+- [TASK] Update the automatic Docker deployment to generate image from master
