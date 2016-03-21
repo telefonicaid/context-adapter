@@ -481,6 +481,7 @@ function getBlackButtonRequestOptions(type, options) {
     case caTestConfig.API_OPERATION.ADMIN.SET_LOG_LEVEL:
       requestOptions.uri = 'http://' + caConfig.CA_HOST + ':' + caConfig.CA_PORT +
         caConfig.CA_ROUTE_SUFFIXES.ADMIN_SET_LOG_LEVEL;
+      requestOptions.method = 'PUT';
       if (options.level) {
         requestOptions.qs = {
           level: options.level
