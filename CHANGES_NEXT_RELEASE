@@ -1,1 +1,2 @@
 - Log level should be exposed as a PUT operation via the admin API
+- [TASK] Include service and subservice in log traces (#79)

@@ -1667,10 +1667,8 @@ function validLogLevelChangeTest(level, done) {
       }
     ),
     function (err, response) {
-      console.log(err);
       expect(err).to.equal(null);
       expect(response.statusCode).to.equal(200);
-      expect(response.statusMessage).to.equal('OK');
       done();
     }
   );
