@@ -880,7 +880,7 @@ describe('Context Adapter server:', function() {
     describe('geolocation update requests',
       caTestHelper.geolocationUpdateTestSuite);
 
-    describe('POST /admin/log', function() {
+    describe('PUT /admin/log', function() {
       it('should accept FATAL as a valid logging level',
         caTestHelper.validLogLevelChangeTest.bind(null, 'FATAL')
       );
@@ -912,7 +912,6 @@ describe('Context Adapter server:', function() {
           function (err, response) {
             expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
-            expect(response.statusMessage).to.equal('OK');
             done();
           }
         );
