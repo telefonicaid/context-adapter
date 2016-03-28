@@ -50,9 +50,10 @@
     "boom": "^2.8.0",
     "hapi": "^8.8.1",
     "joi": "^6.10.1",
-    "logops": "^0.5.0",
+    "logops": "^1.0.0-alpha.5",
     "mkdirp": "^0.5.1",
     "request": "^2.60.0",
-    "revalidator": "^0.3.1"
+    "revalidator": "^0.3.1",
+    "uuid": "^2.0.1"
   }
 }

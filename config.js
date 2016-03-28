@@ -39,12 +39,6 @@
     port: '9999',
     // The path where the Context Adapter server will be expecting requests. Default value: "/v1".
     path: '/v1',
-    // The service to be used if not sent by the Context Broker in the interchanged messages.
-    //  Default value: "blackbutton".
-    defaultService: 'blackbutton',
-    // The service path to be used if not sent by the Context Broker in the interchanged messages.
-    //  Default value: "/".
-    defaultServicePath: '/',
     // The Context Adapter supports 2 modes of operation: 1) It can act as a context provider receiving the redirected
     //  updateContext requests received by the Context Broker as a consequence of new clicks of buttons (to set this
     //  operation mode set the 'mode' configuration option to 'context-provider' and 2) Being notified by the
