@@ -1,2 +1,3 @@
 - Log level should be exposed as a PUT operation via the admin API
 - [TASK] Include service and subservice in log traces (#79)
+- [FEATURE] Use common Fiware-Correlator header in all the platform components ()#78)

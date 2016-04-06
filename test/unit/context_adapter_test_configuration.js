@@ -46,5 +46,7 @@ module.exports = {
       LONGITUDE: '-0.1',
       ACCURACY: '1200.4'
     }
-  }
+  },
+  DEFAULT_SERVICE: 'blackbutton',
+  DEFAULT_SERVICE_PATH: '/'
 };

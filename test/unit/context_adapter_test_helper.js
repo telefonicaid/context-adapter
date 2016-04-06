@@ -462,8 +462,8 @@ function getBlackButtonRequestOptions(type, options) {
       caConfig.CA_PATH,
     method: options.method || 'POST',
     headers: {
-      'Fiware-Service': caConfig.DEFAULT_SERVICE,
-      'Fiware-ServicePath': caConfig.DEFAULT_SERVICE_PATH
+      'Fiware-Service': caTestConfig.DEFAULT_SERVICE,
+      'Fiware-ServicePath': caTestConfig.DEFAULT_SERVICE_PATH
     },
     json: true,
     body: options.body || {}
@@ -663,8 +663,8 @@ function getGeolocationUpdateRequestOptions() {
       caConfig.CA_PATH + caConfig.CA_ROUTE_SUFFIXES.NOTIFY_GEOLOCATION,
     method: 'POST',
     headers: {
-      'Fiware-Service': caConfig.DEFAULT_SERVICE,
-      'Fiware-ServicePath': caConfig.DEFAULT_SERVICE_PATH
+      'Fiware-Service': caTestConfig.DEFAULT_SERVICE,
+      'Fiware-ServicePath': caTestConfig.DEFAULT_SERVICE_PATH
     },
     json: true,
     body: {
