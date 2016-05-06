@@ -36,9 +36,9 @@ var request = require('request');
  */
 function applyAttributeOptions(contextElement, attributes) {
   for (var i = 0; i < attributes.length; i++) {
-    if (attributes[i].value) {
+    if (attributes[i].value || attributes[i].value === '') {
       caHelper.setAttribute(
-        contextElement.attributes[i],
+        contextElement.attributes,
         attributes[i].name,
         attributes[i].value
       );

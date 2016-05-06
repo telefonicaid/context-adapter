@@ -347,6 +347,39 @@ describe('Context Adapter server:', function() {
         );
       });
 
+      it('should respond with a 200 code and OK reasonPhrase if contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME + ' attribute is ""', function (done) {
+        var updateContextPayload = caTestHelper.getUpdateContextPayload({
+          contextElements: {
+            attributes: [{
+              name: caConfig.BUTTON_ENTITY.CA_OPERATION_EXTRA_ATTR_NAME,
+              value: ''
+            }]
+          }
+        });
+        caHelper.setAttribute(
+          updateContextPayload.contextElements[0].attributes,
+          caConfig.BUTTON_ENTITY.CA_INTERACTION_TYPE_ATTR_NAME,
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
+        );
+
+        request(
+          caTestHelper.getBlackButtonRequestOptions(
+            caTestConfig.API_OPERATION.NOTIFY,
+            {
+              body: updateContextPayload
+            }
+          ),
+          function (err, response, body) {
+            expect(err).to.equal(null);
+            expect(response.statusCode).to.equal(200);
+            expect(body.contextResponses[0].statusCode.code).to.equal('200');
+            expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('OK')).to.equal(0);
+            done();
+          }
+        );
+      });
+
       it('should respond with a 200 code and OK reasonPhrase if no contextElement\'s ' +
         caConfig.BUTTON_ENTITY.CA_OPERATION_STATUS_ATTR_NAME + ' attribute and synchronous ' +
         'button operation', function (done) {
@@ -671,6 +704,43 @@ describe('Context Adapter server:', function() {
         );
       });
 
+      it('should respond with a 200 code and OK reasonPhrase if contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.OPERATION_EXTRA_ATTR_NAME + ' attribute is ""', function (done) {
+        var notificationPayload = caTestHelper.getNotificationPayload({
+          contextResponses: [
+            {
+              contextElement: {
+                attributes: [{
+                  name: caConfig.BUTTON_ENTITY.OPERATION_EXTRA_ATTR_NAME,
+                  value:''
+                }]
+              }
+            }
+          ]
+        });
+        caHelper.setAttribute(
+          notificationPayload.contextResponses[0].contextElement.attributes,
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPE_ATTR_NAME,
+          caConfig.BUTTON_ENTITY.INTERACTION_TYPES.SYNCHRONOUS
+        );
+
+        request(
+          caTestHelper.getBlackButtonRequestOptions(
+            caTestConfig.API_OPERATION.NOTIFY,
+            {
+              body: notificationPayload
+            }
+          ),
+          function (err, response, body) {
+            expect(err).to.equal(null);
+            expect(response.statusCode).to.equal(200);
+            expect(body.contextResponses[0].statusCode.code).to.equal('200');
+            expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('OK')).to.equal(0);
+            done();
+          }
+        );
+      });
+
       it('should respond with a 400 code and BAD_PAYLOAD reasonPhrase if no contextElement\'s ' +
         caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME + ' attribute and synchronous ' +
         'button operation', function (done) {
@@ -746,8 +816,8 @@ describe('Context Adapter server:', function() {
         );
       });
 
-      it('should respond with a 200 code and OK reasonPhrase if the contextElement\'s ' +
-        caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME + ' attribute is not equal to "P" and synchronous ' +
+      it('should respond with a 400 code and BAD_OPERATION_STATUS reasonPhrase if the contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME + ' attribute is not equal to "P" or "R" and synchronous ' +
         'button operation', function (done) {
         var notificationPayload = caTestHelper.getNotificationPayload({
           contextResponses: [
@@ -777,15 +847,15 @@ describe('Context Adapter server:', function() {
           function (err, response, body) {
             expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
-            expect(body.contextResponses[0].statusCode.code).to.equal('200');
-            expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+            expect(body.contextResponses[0].statusCode.code).to.equal('400');
+            expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_OPERATION_STATUS')).to.equal(0);
             done();
           }
         );
       });
 
-      it('should respond with a 200 code and OK reasonPhrase if the contextElement\'s ' +
-        caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME + ' attribute is not equal to "P" and asynchronous ' +
+      it('should respond with a 400 code and BAD_OPERATION_STATUS reasonPhrase if the contextElement\'s ' +
+        caConfig.BUTTON_ENTITY.OPERATION_STATUS_ATTR_NAME + ' attribute is not equal to "P" or "R" and asynchronous ' +
         'button operation', function (done) {
         var notificationPayload = caTestHelper.getNotificationPayload({
           contextResponses: [
@@ -815,8 +885,8 @@ describe('Context Adapter server:', function() {
           function (err, response, body) {
             expect(err).to.equal(null);
             expect(response.statusCode).to.equal(200);
-            expect(body.contextResponses[0].statusCode.code).to.equal('200');
-            expect(body.contextResponses[0].statusCode.reasonPhrase).to.equal('OK');
+            expect(body.contextResponses[0].statusCode.code).to.equal('400');
+            expect(body.contextResponses[0].statusCode.reasonPhrase.indexOf('BAD_OPERATION_STATUS')).to.equal(0);
             done();
           }
         );
