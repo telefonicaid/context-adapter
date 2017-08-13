@@ -661,7 +661,7 @@ grunt lint-report
 ```
 
 ### <a id="section7.5"></a> Testing
-The test environment is preconfigured to run the [Mocha](http://visionmedia.github.io/mocha/) Test Runner with support
+The test environment is preconfigured to run the [Mocha](http://mochajs.org/) Test Runner with support
 for the [Chai](http://chaijs.com/) assertion library as well as for [Sinon](http://sinonjs.org/) spies, stubs, etc.,
 following a [BDD](http://chaijs.com/api/bdd/) testing style with `chai.expect` and `chai.should()` available globally
 while executing tests, as well as the [Sinon-Chai](http://chaijs.com/plugins/sinon-chai) plugin.
